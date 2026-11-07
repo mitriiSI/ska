@@ -20,7 +20,7 @@ const AUTHOR_GEN = 'К. А. Соловьёва';
 // ---- structure -------------------------------------------------------------
 // [wixPath, slug, title]
 const NAV = [
-  { title: 'Курс «История»', items: [
+  { title: 'Главная', items: [
     ['/programma', 'programma', 'Программа курса'],
     ['/metodicheskie-iaterialy', 'metodicheskie-materialy', 'Методические материалы'],
     ['/lekcii', 'lekcii', 'Лекции'],
@@ -66,7 +66,7 @@ const NAV = [
     ['/indeks', 'kursovye-indeks', 'Индекс'],
   ]},
 ];
-const CONTACT = ['/contact-me', 'kontakty', 'Контакты'];
+const CONTACT = ['/contact-me', 'kontakty', 'Связаться'];
 
 const pathToSlug = { '/': 'index', [CONTACT[0]]: CONTACT[1] };
 for (const s of NAV) for (const [p, slug] of s.items) pathToSlug[p] = slug;
@@ -214,16 +214,17 @@ for (const s of NAV) for (const [p, slug, title] of s.items) flat.push({ p, slug
 
 function navHtml(currentSlug) {
   let h = '<nav class="nav" id="nav" aria-label="Основное меню"><ul>';
-  h += `<li><a href="index.html"${currentSlug === 'index' ? ' aria-current="page"' : ''}>Главная</a></li>`;
   for (const s of NAV) {
     const items = s.items.filter(([p]) => built.has(p));
     if (!items.length) continue;
-    const active = items.some(([, slug]) => slug === currentSlug);
+    const home = s.title === 'Главная';
+    const active = items.some(([, slug]) => slug === currentSlug) || (home && currentSlug === 'index');
     h += `<li class="dd${active ? ' active' : ''}"><button type="button" aria-expanded="false">${s.title}<svg viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><ul>`;
+    if (home) h += `<li><a href="index.html"${currentSlug === 'index' ? ' aria-current="page"' : ''}>Главная</a></li>`;
     for (const [, slug, title] of items) h += `<li><a href="${slug}.html"${slug === currentSlug ? ' aria-current="page"' : ''}>${title}</a></li>`;
     h += '</ul></li>';
   }
-  h += `<li><a href="kontakty.html"${currentSlug === 'kontakty' ? ' aria-current="page"' : ''}>Контакты</a></li>`;
+  h += `<li><a href="kontakty.html"${currentSlug === 'kontakty' ? ' aria-current="page"' : ''}>Связаться</a></li>`;
   return h + '</ul></nav>';
 }
 
@@ -245,15 +246,15 @@ function layout({ slug, title, body, crumb, desc, pager }) {
 <body>
 <a class="skip" href="#main">К содержанию</a>
 <header class="top">
-  <div class="top-in">
-    <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">И</span><span class="brand-t"><strong>${SITE}</strong><small>Сайт ${AUTHOR_GEN}</small></span></a>
+  <a class="banner" href="index.html" aria-label="${SITE} — на главную"><span class="banner-t">${SITE}</span><span class="banner-s">Сайт ${AUTHOR_GEN.replace('Соловьёва', 'СОЛОВЬЁВА')}</span></a>
+  <div class="top-bar"><div class="top-in">
     <button class="burger" type="button" aria-controls="nav" aria-expanded="false" aria-label="Меню"><span></span><span></span><span></span></button>
     ${navHtml(slug)}
-  </div>
+  </div></div>
 </header>
 <main id="main">
-${slug === 'index' ? '' : `<div class="page-head"><div class="wrap">${crumb ? `<p class="crumb">${crumb}</p>` : ''}<h1>${esc(title)}</h1></div></div>`}
-<div class="wrap content">
+<div class="wrap content panel">
+${slug === 'index' ? '' : `<div class="page-head">${crumb ? `<p class="crumb">${crumb}</p>` : ''}<h1>${esc(title)}</h1></div>`}
 ${body}
 ${pager || ''}
 </div>
@@ -299,7 +300,7 @@ for (const [idx, it] of flat.entries()) {
   const i = sectionItems.indexOf(it);
   const prev = sectionItems[i - 1], next = sectionItems[i + 1];
   const pager = (prev || next) ? `<nav class="pager" aria-label="Соседние страницы">${prev ? `<a class="prev" href="${prev.slug}.html"><small>Назад</small>${prev.title}</a>` : '<span></span>'}${next ? `<a class="next" href="${next.slug}.html"><small>Далее</small>${next.title}</a>` : '<span></span>'}</nav>` : '';
-  fs.writeFileSync(`${OUT}/${it.slug}.html`, layout({ slug: it.slug, title: it.title, body: bodies[it.p], crumb: `<a href="index.html">Главная</a> / ${it.section}`, pager }));
+  fs.writeFileSync(`${OUT}/${it.slug}.html`, layout({ slug: it.slug, title: it.title, body: bodies[it.p], crumb: it.section === 'Главная' ? '<a href="index.html">Главная</a>' : `<a href="index.html">Главная</a> / ${it.section}`, pager }));
   results.push(it.slug);
 }
 
@@ -324,27 +325,7 @@ for (const [idx, it] of flat.entries()) {
 // home
 {
   const intro = pages['/'].blocks.find((b) => b.k === 'rt');
-  const news = newsItems(sortedNews().slice(0, 3));
-  const tile = (href, t, d, n) => `<a class="tile" href="${href}"><span class="tile-n">${n}</span><strong>${t}</strong><small>${d}</small></a>`;
-  const body = `
-<section class="hero">
-  <p class="eyebrow">МГУ имени М. В. Ломоносова</p>
-  <h1>Отечественная история</h1>
-  <p class="hero-p">Сайт для студентов, изучающих отечественную историю. Программа курса, лекции, семинары, задания и результаты проверки работ.</p>
-  <div class="hero-cta"><a class="btn" href="lekcii.html">Презентации лекций</a><a class="btn ghost" href="programma.html">Программа курса</a></div>
-</section>
-<section class="tiles" aria-label="Разделы">
-  ${tile('lekcii.html', 'Лекции', `${lectureCount()} презентаций для ФГУ и мехмата`, '01')}
-  ${tile('metodicheskie-materialy.html', 'Методические материалы', 'Учебник, кейсы, диспуты', '02')}
-  ${tile('fgu-rejtingovaya-sistema.html', 'ФГУ', 'Рейтинг, задания, результаты', '03')}
-  ${tile('mehmat-temy-seminarov.html', 'Мехмат', 'Семинары, эссе, экзамен', '04')}
-  ${tile('speckurs.html', 'Спецкурс', 'Революция и реакция в русской истории', '05')}
-  ${tile('kursovye-temy.html', 'Курсовые работы', 'Темы, методика, индекс', '06')}
-</section>
-<div class="two">
-  <section class="prose card"><h2>О сайте</h2>${cleanRich(intro.h).replace(/«методические материалы»|"методические материалы"/, '«<a href="metodicheskie-materialy.html">методические материалы</a>»').replace(/"Лекции"/, '«<a href="lekcii.html">Лекции</a>»').replace(/"объявления"/, '«<a href="obyavleniya.html">объявления</a>»')}</section>
-  <section class="card"><h2>Объявления</h2><ul class="news">${news}</ul><p class="more"><a href="obyavleniya.html">Все объявления →</a></p></section>
-</div>`;
+  const body = `<section class="prose home-text">${cleanRich(intro.h).replace(/«методические материалы»|"методические материалы"/, '«<a href="metodicheskie-materialy.html">методические материалы</a>»').replace(/"Лекции"/, '«<a href="lekcii.html">Лекции</a>»').replace(/"объявления"/, '«<a href="obyavleniya.html">объявления</a>»')}</section>`;
   fs.writeFileSync(`${OUT}/index.html`, layout({ slug: 'index', title: SITE, body }));
 }
 

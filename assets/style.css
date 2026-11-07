@@ -354,3 +354,67 @@ body {
 .nav a[aria-current="page"], .nav .dd.active > button { color: var(--accent); box-shadow: var(--glass-rim), inset 0 -2px 0 var(--orange); }
 .prose li::marker { color: var(--orange); }
 ::selection { background: color-mix(in srgb, var(--orange) 40%, transparent); }
+
+/* ==========================================================================
+   Макет как на исходном сайте: баннер, тёмная полоса меню, центральная панель
+   ========================================================================== */
+.top { display: contents; }
+.banner {
+  position: relative; display: block; text-decoration: none; text-align: center;
+  height: clamp(190px, 26vw, 330px);
+  background: var(--navy) url("../img/banner.jpg") center / cover no-repeat;
+  color: var(--navy);
+}
+.banner::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255, 255, 255, .0) 55%, color-mix(in srgb, var(--bg) 35%, transparent)); pointer-events: none; }
+.banner-t, .banner-s { position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap; max-width: calc(100% - 24px); z-index: 1; }
+.banner-t {
+  top: clamp(14px, 3.4vw, 40px); font: italic 400 clamp(28px, 5vw, 56px)/1.1 var(--serif);
+  padding: .1em .55em; border-radius: 999px; color: #0b1b44;
+  background: rgba(255, 255, 255, .5); -webkit-backdrop-filter: blur(10px) saturate(1.6); backdrop-filter: blur(10px) saturate(1.6);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .8), 0 8px 24px -8px rgba(11, 27, 68, .35);
+}
+.banner-s {
+  bottom: clamp(12px, 2.6vw, 30px); font: 500 clamp(13px, 1.9vw, 22px)/1 var(--sans); letter-spacing: .22em;
+  padding: .55em 1.2em; border-radius: 999px; color: #0b1b44;
+  background: rgba(255, 255, 255, .5); -webkit-backdrop-filter: blur(10px) saturate(1.6); backdrop-filter: blur(10px) saturate(1.6);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .8), 0 8px 24px -8px rgba(11, 27, 68, .35);
+}
+.top-bar {
+  position: sticky; top: 0; z-index: 50; background: var(--navy);
+  border-top: 1px solid rgba(255, 255, 255, .12); border-bottom: 1px solid rgba(255, 255, 255, .12);
+  box-shadow: 0 6px 20px -10px rgba(11, 27, 68, .6);
+}
+.top-bar .top-in { width: min(1180px, 100% - 32px); min-height: 0; justify-content: center; gap: 0; }
+.nav { margin: 0; }
+.nav > ul { gap: 0; }
+.nav a, .nav button { color: #eaf0ff; border-radius: 0; padding: 14px 22px; font: 400 17px/1 var(--serif); border-left: 1px solid rgba(255, 255, 255, .22); background-image: none; box-shadow: none; }
+.nav > ul > li:last-child > a, .nav > ul > li:last-child > button { border-right: 1px solid rgba(255, 255, 255, .22); }
+.nav a:hover, .nav button:hover, .nav .dd.open > button { background-color: rgba(255, 255, 255, .14); background-image: none; box-shadow: none; color: #fff; }
+.nav a[aria-current="page"], .nav .dd.active > button { background-color: var(--accent); background-image: none; color: #fff; box-shadow: inset 0 -3px 0 var(--orange); }
+.nav .dd > ul { top: 100%; margin-top: 0; border-radius: 0 0 14px 14px; background-color: var(--navy); background-image: none; border: 1px solid rgba(255, 255, 255, .18); padding: 4px; box-shadow: 0 16px 32px -12px rgba(0, 0, 0, .5); -webkit-backdrop-filter: none; backdrop-filter: none; }
+.nav .dd > ul a { border: 0; border-radius: 8px; padding: 11px 14px; font-size: 16px; }
+.burger { background: rgba(255, 255, 255, .1); border-color: rgba(255, 255, 255, .3); margin: 8px 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+.burger span { background: #fff; }
+
+.content.panel {
+  width: min(1000px, 100% - 32px); margin: 24px auto 56px; padding: 32px clamp(18px, 4vw, 48px) 40px;
+  background-color: var(--glass-bg); background-image: var(--glass-sheen);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+  border: 1px solid var(--glass-edge-dim); border-radius: 26px; box-shadow: var(--glass-rim), var(--glass-shadow);
+}
+.panel .page-head { background: none; border: 0; padding: 0 0 18px; margin-bottom: 22px; border-bottom: 2px solid var(--orange); }
+.panel .page-head h1 { font-size: clamp(26px, 4vw, 38px); }
+.panel .crumb { margin-bottom: 6px; }
+.panel .content > h2:first-child { margin-top: 0; }
+.panel .prose { max-width: none; }
+.home-text { font-size: 19px; text-align: justify; hyphens: auto; }
+.panel .card { background-color: color-mix(in srgb, var(--glass-bg-strong) 70%, transparent); }
+
+@media (max-width: 1100px) {
+  .top-bar .top-in { justify-content: flex-end; }
+  .nav { position: absolute; top: 100%; left: 0; right: 0; background: var(--navy); border-bottom: 1px solid rgba(255, 255, 255, .18); }
+  .nav a, .nav button { border: 0 !important; border-bottom: 1px solid rgba(255, 255, 255, .12) !important; padding: 14px 10px; }
+  .nav .dd > ul { position: static; border: 0; border-left: 2px solid var(--orange); border-radius: 0; box-shadow: none; background: transparent; margin: 0 0 6px 10px; }
+}
+@media (max-width: 560px) { .banner-s { letter-spacing: .1em; } .content.panel { margin-top: 16px; border-radius: 20px; } }
+@media print { .banner, .top-bar { display: none; } .content.panel { box-shadow: none; border: 0; } }
