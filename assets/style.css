@@ -418,3 +418,19 @@ body {
 }
 @media (max-width: 560px) { .banner-s { letter-spacing: .1em; } .content.panel { margin-top: 16px; border-radius: 20px; } }
 @media print { .banner, .top-bar { display: none; } .content.panel { box-shadow: none; border: 0; } }
+
+/* Форма «Связаться» */
+.cform { max-width: 720px; margin: 20px 0; }
+.cform label { display: block; font-weight: 500; margin-bottom: 14px; }
+.cform label span { color: var(--orange); }
+.cform input, .cform textarea { display: block; width: 100%; margin-top: 6px; padding: 12px 14px; font: inherit; color: var(--ink); background: color-mix(in srgb, var(--surface) 70%, transparent); border: 1px solid var(--glass-edge-dim); border-radius: 14px; box-shadow: inset 0 1px 3px rgba(11, 27, 68, .12); }
+.cform input:focus, .cform textarea:focus { outline: 3px solid var(--orange); outline-offset: 1px; border-color: var(--accent); }
+.cform textarea { resize: vertical; min-height: 140px; }
+.cform .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.cform-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.cform .btn { border: 0; cursor: pointer; font: 600 17px/1 var(--sans); }
+.cform .btn:disabled { opacity: .6; cursor: progress; }
+#contact-status { margin: 0; font-weight: 500; }
+#contact-status.ok { color: #1b7a3a; }
+#contact-status.err { color: #b3261e; }
+@media (prefers-color-scheme: dark) { #contact-status.ok { color: #5fd68a; } #contact-status.err { color: #ff8a80; } }

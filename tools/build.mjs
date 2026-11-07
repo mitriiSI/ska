@@ -228,13 +228,13 @@ function navHtml(currentSlug) {
   return h + '</ul></nav>';
 }
 
-function layout({ slug, title, body, crumb, desc, pager }) {
+function layout({ slug, title, body, crumb, desc, pager, script }) {
   const t = slug === 'index' ? `${SITE} — сайт ${AUTHOR_GEN}` : `${title} — ${SITE}`;
   return `<!doctype html>
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'${script ? '; connect-src https://formsubmit.co' : ''}">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(t)}</title>
@@ -266,7 +266,7 @@ ${pager || ''}
   </div>
 </footer>
 <script src="assets/app.js"></script>
-</body>
+${script ? `<script src="assets/${script}"></script>\n` : ''}</body>
 </html>`;
 }
 
@@ -315,11 +315,23 @@ for (const [idx, it] of flat.entries()) {
     <dt>Телефон</dt><dd><a href="tel:+79166082789">+7 (916) 608-27-89</a></dd>
   </dl></div>
 </div>
+<div class="card cform">
+  <h2>Написать сообщение</h2>
+  <form id="contact-form" novalidate>
+    <label>Имя <span aria-hidden="true">*</span><input name="name" type="text" autocomplete="name" required maxlength="120"></label>
+    <label>Email <span aria-hidden="true">*</span><input name="email" type="email" autocomplete="email" required maxlength="200"></label>
+    <label>Тема<input name="subject" type="text" maxlength="200"></label>
+    <label>Сообщение <span aria-hidden="true">*</span><textarea name="message" rows="6" required maxlength="5000"></textarea></label>
+    <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <div class="cform-row"><button class="btn" type="submit">Отправить</button><p id="contact-status" role="status" aria-live="polite"></p></div>
+    <noscript><p>Для отправки нужен JavaScript. Или напишите на <a href="mailto:solovyevka@gmail.com">solovyevka@gmail.com</a>.</p></noscript>
+  </form>
+</div>
 <div class="card contact tech">
   <div><h2>Вопросы по работе сайта</h2>
   <p>Не открывается страница, не скачивается файл, что-то отображается неправильно? Напишите в Telegram: <a href="https://t.me/qddwxd" target="_blank" rel="noopener">@qddwxd</a>.</p></div>
 </div>`;
-  fs.writeFileSync(`${OUT}/kontakty.html`, layout({ slug: 'kontakty', title: 'Контакты', body, crumb: '<a href="index.html">Главная</a>' }));
+  fs.writeFileSync(`${OUT}/kontakty.html`, layout({ slug: 'kontakty', title: 'Контакты', body, crumb: '<a href="index.html">Главная</a>', script: 'contact-form.js' }));
 }
 
 // home
