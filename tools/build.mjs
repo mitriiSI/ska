@@ -287,7 +287,7 @@ ${pager || ''}
 <footer class="foot">
   <div class="wrap foot-in">
     <p>Сайт предназначен для студентов МГУ имени М. В. Ломоносова.<br>© ${AUTHOR}</p>
-    <p><a href="kontakty.html">Связаться</a><br>Вопросы по работе сайта: <a href="https://t.me/qddwxd" target="_blank" rel="noopener">@qddwxd</a></p>
+    <p>Вопросы по работе сайта: <a href="https://t.me/qddwxd" target="_blank" rel="noopener">@qddwxd</a></p>
   </div>
 </footer>
 <script src="assets/app.js"></script>
