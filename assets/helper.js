@@ -1,5 +1,5 @@
 // Помощник по сайту: кнопка в углу и окно диалога. Поиск идёт локально по assets/search-index.json.
-const BASE = new URL('./', import.meta.url);
+import { loadEngine } from './engine.js';
 const KEY = 'site-helper-v1';
 const SUGGEST = ['Рейтинговая система', 'Лекции', 'Вопросы к экзамену', 'Как связаться'];
 const TEXT = {
@@ -103,17 +103,6 @@ function clearChat() {
 }
 
 // --- поиск ------------------------------------------------------------------------
-let enginePromise = null;
-function loadEngine() {
-  if (!enginePromise) {
-    enginePromise = Promise.all([
-      import(new URL('search-core.js', BASE)),
-      fetch(new URL('search-index.json', BASE)).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); }),
-    ]).then(([core, index]) => core.createEngine(index)).catch((e) => { enginePromise = null; throw e; });
-  }
-  return enginePromise;
-}
-
 async function answer(q) {
   let engine;
   try { engine = await loadEngine(); } catch { return { r: 'bot', t: TEXT.fail }; }
@@ -171,3 +160,9 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !panel.h
 for (const m of state.msgs) log.append(renderMsg(m));
 clearBtn.hidden = state.msgs.length === 0;
 if (state.open) setOpen(true, false);
+
+// Другие части сайта (например, главная) могут открыть помощника с готовым вопросом.
+document.addEventListener('site-helper:ask', (e) => {
+  setOpen(true, true);
+  if (e.detail && e.detail.q) ask(String(e.detail.q));
+});

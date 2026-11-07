@@ -278,7 +278,7 @@ function layout({ slug, title, body, crumb, desc, pager, script }) {
   </div></div>
 </header>
 <main id="main">
-<div class="wrap content panel">
+<div class="wrap content panel${slug === 'index' ? ' home-panel' : ''}">
 ${slug === 'index' ? '' : `<div class="page-head">${crumb ? `<p class="crumb">${crumb}</p>` : ''}<h1>${esc(title)}</h1></div>`}
 ${body}
 ${pager || ''}
@@ -286,7 +286,7 @@ ${pager || ''}
 </main>
 <script src="assets/app.js"></script>
 <script type="module" src="assets/helper.js"></script>
-${script ? `<script src="assets/${script}"></script>\n` : ''}</body>
+${slug === 'index' ? '<script type="module" src="assets/home.js"></script>\n' : ''}${script ? `<script src="assets/${script}"></script>\n` : ''}</body>
 </html>`;
 }
 
@@ -365,19 +365,26 @@ for (const sec of NAV) {
 
 // home
 {
-  const body = `<section class="prose home-text">
-<p class="lead">Добро пожаловать на учебный сайт К. А. Соловьёва для студентов МГУ имени М. В. Ломоносова, изучающих отечественную историю. Здесь собраны программа курса, презентации лекций, темы и литература семинаров, задания, рейтинг и результаты проверки работ.</p>
-<h2>Как найти нужное</h2>
-<ul>
-<li><a href="razdel-dopolnitelno.html">Важное</a> — программа курса, методические материалы, лекции, полезные сайты и объявления.</li>
-<li><a href="razdel-speckurs.html">Спецкурс</a> — описание спецкурса, презентации лекций, семинары, темы выступлений на конференции и методика дебатов.</li>
-<li><a href="razdel-fgu.html">ФГУ</a> и <a href="razdel-mehmat.html">Мехмат</a> — материалы для вашей группы: темы и литература семинаров, задания, рейтинговая система, результаты проверки работ, итоги семестра и вопросы к экзамену.</li>
-<li><a href="razdel-kursovye.html">Курсовые работы</a> — темы, методика подготовки, распределение тем и индекс.</li>
-<li><a href="kontakty.html">Связаться</a> — контакты преподавателя и форма, через которую можно написать сообщение прямо с сайта.</li>
-</ul>
-<h2>Помощник по сайту</h2>
-<p>Если вы не знаете, где искать, нажмите круглую кнопку в правом нижнем углу и задайте вопрос своими словами: например, «как набираются баллы», «лекция 5» или «требования к статье». Помощник найдёт нужную страницу, строку таблицы или слайд презентации и подскажет, куда перейти. Он знает всё, что есть на сайте, включая тексты лекций и документов. Если ответа на сайте нет, он честно скажет об этом.</p>
-<p>О новостях и изменениях читайте на странице «<a href="obyavleniya.html">Объявления</a>».</p>
+  const SEC = [
+    ['Важное', 'razdel-dopolnitelno.html', 'Программа, лекции, объявления', 'megaphone'],
+    ['Спецкурс', 'razdel-speckurs.html', 'Лекции, семинары, дебаты', 'book'],
+    ['ФГУ', 'razdel-fgu.html', 'Рейтинг, задания, результаты', 'users'],
+    ['Мехмат', 'razdel-mehmat.html', 'Семинары, эссе, экзамен', 'chart'],
+    ['Курсовые работы', 'razdel-kursovye.html', 'Темы, методика, индекс', 'pen'],
+    ['Связаться', 'kontakty.html', 'Контакты и сообщение', 'chat'],
+  ];
+  const icon = (k) => `<svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[k]}</svg>`;
+  const chip = (t) => `<button class="home-chip" type="button">${t}</button>`;
+  const body = `<section class="home">
+<p class="home-lead">Учебный сайт для студентов МГУ имени М. В. Ломоносова: лекции, семинары, задания и результаты.</p>
+<form class="home-search" id="home-search" role="search">
+  <input id="home-q" name="q" type="search" autocomplete="off" maxlength="200" placeholder="Например: лекция 5" aria-label="Поиск по сайту">
+  <button type="submit">Найти</button>
+</form>
+<div class="home-chips" aria-label="Быстрый поиск">${['Рейтинговая система', 'Лекции', 'Вопросы к экзамену', 'Как связаться'].map(chip).join('')}</div>
+<div class="home-results" id="home-results" role="region" aria-live="polite" aria-label="Результаты поиска" hidden></div>
+<div class="hub home-hub" id="home-hub">${SEC.map(([t, href, d, ic]) => `<a class="hub-tile" href="${href}">${icon(ic)}<span>${t}</span><small>${d}</small></a>`).join('')}</div>
+<p class="home-foot">Не нашли? <button class="home-ask-link" id="home-ask" type="button">Спросите помощника</button> — кнопка в правом нижнем углу.</p>
 </section>`;
   fs.writeFileSync(`${OUT}/index.html`, layout({ slug: 'index', title: SITE, body }));
 }
