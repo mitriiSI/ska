@@ -1,13 +1,17 @@
 name: Проверки
 
-# В этом репозитории разрабатывается журнал баллов. Публикация сайта здесь отключена:
-# сайт живёт в dur0vd/ska_hist, сюда перенесём готовое.
+# Проверки на каждый push/PR; при push в main сайт публикуется на GitHub Pages.
+# В Settings → Pages источником должен быть выбран «GitHub Actions».
 on:
   push:
   pull_request:
 
 permissions:
   contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
@@ -21,3 +25,28 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
+      - name: Собрать каталог сайта
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          mkdir _site
+          cp *.html _site/
+          cp -r assets img files _site/
+          touch _site/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        with:
+          path: _site
+
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

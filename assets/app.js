@@ -44,3 +44,16 @@
     if (active) active.classList.add('open');
   }
 })();
+
+// Liquid glass: блик следует за курсором
+(function () {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var sel = '.card, .tile, .file, .lec, .pager a, .btn, .content > .news';
+  document.addEventListener('pointermove', function (e) {
+    var el = e.target.closest && e.target.closest(sel);
+    if (!el) return;
+    var r = el.getBoundingClientRect();
+    el.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+    el.style.setProperty('--my', (e.clientY - r.top) + 'px');
+  }, { passive: true });
+})();
