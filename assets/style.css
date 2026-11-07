@@ -368,7 +368,7 @@ body {
 .mast-t { font: 400 clamp(40px, 7.4vw, 78px)/1.05 "Marck Script", "Segoe Script", cursive; letter-spacing: 0; }
 .mast-s { font: 500 clamp(13px, 1.7vw, 17px)/1.2 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); text-wrap: balance; }
 @media (hover: hover) { .masthead:hover .mast-t { color: var(--accent); } }
-.top-bar { position: sticky; top: 0; z-index: 50; padding: 8px 0 10px; background: color-mix(in srgb, var(--bg) 40%, transparent); -webkit-backdrop-filter: blur(14px) saturate(1.6); backdrop-filter: blur(14px) saturate(1.6); }
+.top-bar { position: sticky; top: 0; z-index: 50; padding: 8px 0 10px; background: none; }
 .top-bar .top-in { width: min(1180px, 100% - 32px); min-height: 0; justify-content: center; gap: 0; }
 .nav { margin: 0; }
 .nav > ul { gap: 10px; flex-wrap: wrap; justify-content: center; }
