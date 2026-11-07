@@ -205,7 +205,8 @@ function renderSpeckursLectures() {
 // announcements -----------------------------------------------------------
 const newsItems = (list) => list.map((n) => `<li><time>${esc(String(n.date || ''))}</time><span>${sanitizePage(n.html)}</span></li>`).join('');
 function renderAnnouncements() {
-  return `<ul class="news">${newsItems(sortedNews())}</ul>`;
+  const items = newsItems(sortedNews());
+  return items ? `<ul class="news">${items}</ul>` : '<p>Объявлений пока нет.</p>';
 }
 
 // ---- layout -------------------------------------------------------------------
