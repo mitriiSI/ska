@@ -6,7 +6,6 @@ if (form) {
   const input = document.getElementById('home-q');
   const box = document.getElementById('home-results');
   const hub = document.getElementById('home-hub');
-  const chips = document.querySelectorAll('.home-chip');
   const EXAMPLES = ['лекция 5', 'рейтинговая система', 'вопросы к экзамену', 'как связаться', 'требования к статье'];
   const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; };
 
@@ -63,7 +62,6 @@ if (form) {
   input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(() => run(input.value), 130); });
   form.addEventListener('submit', (e) => { e.preventDefault(); clearTimeout(timer); run(input.value); });
   input.addEventListener('focus', () => { loadEngine().catch(() => {}); });
-  for (const c of chips) c.addEventListener('click', () => { input.value = c.textContent; input.focus(); run(input.value); });
   document.addEventListener('keydown', (e) => {
     if (e.key === '/' && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement && document.activeElement.tagName)) { e.preventDefault(); input.focus(); }
     if (e.key === 'Escape' && document.activeElement === input && input.value) { input.value = ''; reset(); }

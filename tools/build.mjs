@@ -373,14 +373,12 @@ for (const sec of NAV) {
     ['Связаться', 'kontakty.html', 'Контакты и сообщение', 'chat'],
   ];
   const icon = (k) => `<svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[k]}</svg>`;
-  const chip = (t) => `<button class="home-chip" type="button">${t}</button>`;
   const body = `<section class="home">
 <p class="home-lead">Учебный сайт для студентов МГУ имени М. В. Ломоносова. Напишите, что нужно найти, и ответ появится сразу.</p>
 <form class="home-search" id="home-search" role="search">
   <input id="home-q" name="q" type="search" autocomplete="off" maxlength="200" placeholder="Например: лекция 5" aria-label="Поиск и помощник по сайту">
   <button type="submit">Найти</button>
 </form>
-<div class="home-chips" aria-label="Быстрый поиск">${['Рейтинговая система', 'Лекции', 'Вопросы к экзамену', 'Как связаться'].map(chip).join('')}</div>
 <div class="home-results" id="home-results" role="region" aria-live="polite" aria-label="Результаты поиска" hidden></div>
 <div class="hub home-hub" id="home-hub">${SEC.map(([t, href, d, ic]) => `<a class="hub-tile" href="${href}">${icon(ic)}<span>${t}</span><small>${d}</small></a>`).join('')}</div>
 </section>`;
