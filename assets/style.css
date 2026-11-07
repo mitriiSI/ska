@@ -1,29 +1,33 @@
 :root {
-  --bg: #faf7f2;
+  --bg: #f2f6ff;
   --surface: #ffffff;
-  --ink: #1f2430;
-  --muted: #5d6573;
-  --line: #e6dfd3;
-  --accent: #7a1f2b;
+  --ink: #0b1b44;
+  --muted: #4a5a80;
+  --line: #d3def5;
+  --accent: #0a4dff;
+  --navy: #0b1b44;
+  --orange: #ff7a1a;
   --accent-ink: #ffffff;
-  --accent-soft: #f4e7e8;
-  --gold: #b08d57;
-  --shadow: 0 1px 2px rgba(31, 36, 48, .06), 0 8px 24px rgba(31, 36, 48, .06);
+  --accent-soft: #e2eaff;
+  --gold: #c24e00;
+  --shadow: 0 1px 2px rgba(11, 27, 68, .06), 0 8px 24px rgba(11, 27, 68, .08);
   --radius: 14px;
   --serif: Charter, "Iowan Old Style", "Palatino Linotype", Georgia, "Times New Roman", serif;
   --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #14161b;
-    --surface: #1c1f26;
-    --ink: #eceae6;
-    --muted: #a3a9b5;
-    --line: #2c303a;
-    --accent: #e08a94;
-    --accent-ink: #1a1012;
-    --accent-soft: #2a1d20;
-    --gold: #d2b27c;
+    --bg: #060c1f;
+    --surface: #0e1733;
+    --ink: #e8eeff;
+    --muted: #9fb0d6;
+    --line: #1f2d57;
+    --accent: #5b8cff;
+    --navy: #060c1f;
+    --orange: #ff9a3c;
+    --accent-ink: #050a1c;
+    --accent-soft: #15234d;
+    --gold: #ff9a3c;
     --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .3);
   }
 }
@@ -215,10 +219,10 @@ a:hover { text-decoration-thickness: 2px; }
   --glass-tint: rgba(255, 255, 255, .22);
   --glass-edge: rgba(255, 255, 255, .75);
   --glass-edge-dim: rgba(255, 255, 255, .18);
-  --glass-shade: rgba(31, 36, 48, .10);
+  --glass-shade: rgba(11, 27, 68, .10);
   --glass-blur: 18px;
   --glass-sat: 1.8;
-  --glass-shadow: 0 1px 1px rgba(31, 36, 48, .05), 0 10px 30px -6px rgba(31, 36, 48, .18);
+  --glass-shadow: 0 1px 1px rgba(11, 27, 68, .05), 0 10px 30px -6px rgba(11, 27, 68, .18);
   --glass-rim:
     inset 0 1px 0 var(--glass-edge),
     inset 0 -1px 0 var(--glass-edge-dim),
@@ -274,7 +278,7 @@ body {
 .foot { background-color: var(--glass-bg); border-top: 1px solid var(--glass-edge-dim); }
 .page-head { background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 14%, transparent), transparent); border-bottom: 1px solid var(--glass-edge-dim); }
 .nav .dd > ul { background-color: var(--glass-bg-strong); border-radius: 18px; }
-.top, .foot { border-radius: 0; box-shadow: var(--glass-rim), 0 6px 24px -10px rgba(31, 36, 48, .25); }
+.top, .foot { border-radius: 0; box-shadow: var(--glass-rim), 0 6px 24px -10px rgba(11, 27, 68, .25); }
 
 /* Блик за курсором (--mx/--my задаёт assets/app.js) */
 .card, .tile, .file, .lec, .pager a, .btn, .content > .news { position: relative; isolation: isolate; }
@@ -302,7 +306,7 @@ body {
 .nav a[aria-current="page"], .nav .dd.active > button {
   background-color: var(--glass-bg-strong);
   background-image: var(--glass-sheen);
-  box-shadow: var(--glass-rim), 0 4px 12px -4px rgba(31, 36, 48, .2);
+  box-shadow: var(--glass-rim), 0 4px 12px -4px rgba(11, 27, 68, .2);
 }
 .nav .dd > ul a { border-radius: 12px; }
 .card, .tile, .file, .lec, .pager a, .shot a, .content > .news { border-radius: 22px; }
@@ -329,3 +333,24 @@ body {
   .card, .tile, .file, .lec, .pager a, .shot a, .btn { box-shadow: none; background: #fff; backdrop-filter: none; -webkit-backdrop-filter: none; }
   body { background: #fff; }
 }
+
+/* ==========================================================================
+   Палитра: electric blue + dark blue, оранжевый — контекстный акцент
+   ========================================================================== */
+:focus-visible { outline-color: var(--orange); }
+.tile:hover, .file:hover, .lec:hover, .pager a:hover { border-color: var(--orange); }
+.lec::after { background: var(--orange); }
+.tile-n, .eyebrow, .news time { color: var(--gold); }
+.btn:not(.ghost), .brand-mark {
+  background-color: var(--accent);
+  background-image: linear-gradient(160deg, rgba(255, 255, 255, .32), rgba(255, 255, 255, 0) 55%), linear-gradient(180deg, transparent, var(--navy));
+  color: #fff;
+}
+@media (prefers-color-scheme: dark) { .btn:not(.ghost), .brand-mark { background-color: #1f5cff; color: #fff; } }
+.btn:not(.ghost):hover { box-shadow: 0 8px 24px -6px color-mix(in srgb, var(--orange) 60%, transparent), var(--glass-rim); }
+.btn.ghost { border-color: var(--accent); }
+.btn.ghost:hover { color: var(--orange); border-color: var(--orange); }
+.page-head { background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 16%, transparent), transparent); }
+.nav a[aria-current="page"], .nav .dd.active > button { color: var(--accent); box-shadow: var(--glass-rim), inset 0 -2px 0 var(--orange); }
+.prose li::marker { color: var(--orange); }
+::selection { background: color-mix(in srgb, var(--orange) 40%, transparent); }
