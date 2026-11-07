@@ -60,3 +60,17 @@ test('в результатах нет мусора: у каждого есть 
     for (const x of r.results) { assert.ok(x.href && x.title, q); }
   }
 });
+
+test('общий запрос ведёт на страницу, конкретный – на конкретный файл', () => {
+  const lec = top('лекции');
+  assert.equal(lec.kind, 'results');
+  assert.equal(lec.results[0].href, 'lekcii.html');
+  assert.ok(lec.results.every((x) => !/^files\//.test(x.href)), 'для «лекции» не должно быть отдельных файлов');
+  const five = top('лекция 5');
+  assert.equal(five.results[0].href, 'files/lekciya-5.pptx');
+  assert.ok(five.results.every((x) => /lekciya-5\.pptx$/.test(x.href)));
+  assert.equal(top('лекция 5 мехмат').results[0].href, 'files/mehmat-lekciya-5.pptx');
+  assert.equal(top('лекции').results[0].action, 'Открыть страницу');
+  assert.equal(top('как связаться').results[0].href.split('#')[0], 'kontakty.html');
+  assert.equal(top('фгу').results[0].href, 'razdel-fgu.html');
+});

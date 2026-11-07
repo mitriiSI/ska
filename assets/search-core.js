@@ -117,6 +117,21 @@ export function createEngine(index) {
     normText[ci] = norm(c.t + ' ' + titleOf(c));
   });
   const avgLen = totalLen / N;
+
+  // Названия страниц и файлов: «лекции» ведёт на страницу «Лекции», «лекция 5» – на файлы лекции 5.
+  const titleStems = (text) => new Set(tokenize(text).filter((t) => !STOP.has(t)).map(stem));
+  const entities = [];
+  pages.forEach((p, pi) => entities.push({ kind: 'page', i: pi, stems: titleStems(p.title + ' ' + (p.alias || '')) }));
+  files.forEach((f, fi) => entities.push({ kind: 'file', i: fi, stems: titleStems(f.title) }));
+  const firstChunkOfFile = new Map();
+  chunks.forEach((c) => { if (c.d !== undefined && !firstChunkOfFile.has(c.d)) firstChunkOfFile.set(c.d, c); });
+  const cut = (t, n) => (t.length > n ? t.slice(0, t.lastIndexOf(' ', n) > 40 ? t.lastIndexOf(' ', n) : n) + ' …' : t);
+  function pageSummary(pi) {
+    const own = chunks.filter((c) => c.p === pi && c.d === undefined);
+    const text = own.filter((c) => c.u === undefined).slice(0, 2).map((c) => c.t).join(' ') || own.slice(0, 8).map((c) => c.t).join(' · ');
+    return cut(text, 170);
+  }
+
   const vocab = [...postings.keys()];
   const idf = (n) => Math.log(1 + (N - n + 0.5) / (n + 0.5));
 
@@ -169,6 +184,33 @@ export function createEngine(index) {
     return c.f ? url + '#:~:text=' + encodeURIComponent(c.f).replace(/-/g, '%2D') : url;
   }
 
+  function buildEntity(e) {
+    if (e.kind === 'page') {
+      const p = pages[e.i];
+      const sum = pageSummary(e.i);
+      return { title: p.title, sub: p.section, action: 'Открыть страницу', href: p.url, snippet: sum ? [{ t: sum }] : [], links: [] };
+    }
+    const f = files[e.i];
+    const first = firstChunkOfFile.get(e.i);
+    return { title: f.title, sub: f.kind === 'pdf' ? 'Документ PDF' : 'Презентация', action: 'Открыть файл', href: f.u, snippet: first ? [{ t: cut(first.t, 170) }] : [], links: [] };
+  }
+  function titleMatches(qStems) {
+    const hasDigit = qStems.some((q) => /^\d+$/.test(q));
+    if (!qStems.some((q) => !/^\d+$/.test(q))) return [];
+    const exp = qStems.map((q) => new Set(expandStem(q).stems));
+    if (exp.some((x) => !x.size)) return [];
+    const found = [];
+    for (const e of entities) {
+      if (e.kind === 'file' && !hasDigit) continue;
+      if (!exp.every((x) => [...x].some((st) => e.stems.has(st)))) continue;
+      found.push({ ...e, dist: Math.max(0, e.stems.size - qStems.length) });
+    }
+    if (!found.length) return [];
+    found.sort((a, b) => a.dist - b.dist || (a.kind === b.kind ? a.i - b.i : a.kind === 'page' ? -1 : 1));
+    const best = found[0].dist;
+    return best > 2 ? [] : found.filter((x) => x.dist <= best + 1);
+  }
+
   function search(query, limit = 3) {
     const q = norm(query).trim();
     if (!q) return { kind: 'empty' };
@@ -180,6 +222,21 @@ export function createEngine(index) {
     let useful = words.filter((w) => !STOP.has(w));
     if (!useful.length) useful = words;
     const qStems = [...new Set(useful.map(stem))];
+    const tm = titleMatches(qStems);
+    const finish = (bm) => {
+      if (!tm.length) return bm.length ? { kind: 'results', results: bm } : { kind: 'none' };
+      const out = tm.slice(0, limit).map(buildEntity);
+      if (tm[0].dist > 0 && out.length < limit) {
+        const seen = new Set(out.map((x) => x.href.split('#')[0]));
+        for (const x of bm) {
+          const b = x.href.split('#')[0];
+          if (/^files\//.test(b) || seen.has(b)) continue;
+          seen.add(b); out.push(x);
+          if (out.length >= limit) break;
+        }
+      }
+      return { kind: 'results', results: out };
+    };
 
     const scores = new Map(), hits = new Map();
     const matchedStems = new Set();
@@ -199,7 +256,7 @@ export function createEngine(index) {
         }
       }
     }
-    if (!scores.size || unknown / qStems.length >= 0.5) return { kind: 'none' };
+    if (!scores.size || unknown / qStems.length >= 0.5) return finish([]);
 
     const need = qStems.length <= 2 ? qStems.length - unknown : Math.ceil(qStems.length * 0.6);
     const phrase = useful.join(' ');
@@ -211,7 +268,7 @@ export function createEngine(index) {
       if (useful.length > 1 && normText[ci].includes(phrase)) s *= 1.6;
       ranked.push([ci, s]);
     }
-    if (!ranked.length) return { kind: 'none' };
+    if (!ranked.length) return finish([]);
     ranked.sort((a, b) => b[1] - a[1]);
 
     const perPage = new Map(), results = [], seenHref = new Set();
@@ -242,7 +299,7 @@ export function createEngine(index) {
       }
       results.push({ title, sub, action, href, snippet: c.u !== undefined && c.d === undefined ? [] : window(c.t, matchedStems), links: (c.l || []).filter((l) => /^https?:/.test(l[1])).slice(0, 3) });
     }
-    return { kind: 'results', results };
+    return finish(results);
   }
 
   return { search };

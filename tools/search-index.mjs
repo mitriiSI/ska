@@ -21,12 +21,12 @@ export function buildSearchIndex(root) {
     // пробелы между соседними элементами и на месте <br>, чтобы слова не слипались
     panel.find('br').replaceWith(' ');
     panel.find('time, .lec-n, .lec-t, .lec-s, .file-txt strong, .file-txt small, .tile-n').after(' ');
-    panel.find('.page-head').first().find('.crumb').remove();
     const isHome = file === 'index.html';
     const title = isHome ? 'Главная' : clean(panel.find('.page-head h1').first().text()) || clean($('title').text());
     const crumbLinks = panel.find('.page-head .crumb a');
     const section = crumbLinks.length > 1 ? clean(crumbLinks.last().text()) : '';
-    const pi = pages.push({ title, url: file, section }) - 1;
+    const pi = pages.push({ title, url: file, section, ...(file === 'kontakty.html' ? { alias: 'Связаться' } : {}) }) - 1;
+    panel.find('.page-head').first().find('.crumb').remove();
 
     let heading = '', buf = [], links = [], first = '';
     const flush = () => {

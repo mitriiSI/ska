@@ -30,6 +30,7 @@ const svgIcon = (d, size = 24) => {
 };
 const ICON_BUBBLE = '<path d="M4 5h16v11H11l-5 4v-4H4z"/><circle cx="11.2" cy="10" r="2.4"/><path d="m13 11.8 2.2 2.2"/>';
 const ICON_CLOSE = '<path d="M6 6l12 12M18 6 6 18"/>';
+const ICON_TRASH = '<path d="M5 7h14M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/>';
 const ICON_SEND = '<path d="M4 12 20 4l-5 16-3-6.5z"/>';
 
 let state = store.read();
@@ -45,8 +46,11 @@ const panel = el('section', 'hlp-panel');
 panel.id = 'hlp-panel'; panel.hidden = true; panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-label', 'Помощник по сайту');
 const head = el('header', 'hlp-head');
 head.append(el('strong', '', 'Помощник по сайту'));
-const closeBtn = el('button', 'hlp-close'); closeBtn.type = 'button'; closeBtn.setAttribute('aria-label', 'Закрыть'); closeBtn.append(svgIcon(ICON_CLOSE, 18));
-head.append(closeBtn);
+const tools = el('div', 'hlp-tools');
+const clearBtn = el('button', 'hlp-close'); clearBtn.type = 'button'; clearBtn.title = 'Очистить чат'; clearBtn.setAttribute('aria-label', 'Очистить чат'); clearBtn.append(svgIcon(ICON_TRASH, 18));
+const closeBtn = el('button', 'hlp-close'); closeBtn.type = 'button'; closeBtn.title = 'Закрыть'; closeBtn.setAttribute('aria-label', 'Закрыть и очистить чат'); closeBtn.append(svgIcon(ICON_CLOSE, 18));
+tools.append(clearBtn, closeBtn);
+head.append(tools);
 const log = el('div', 'hlp-log'); log.setAttribute('role', 'log'); log.setAttribute('aria-live', 'polite'); log.tabIndex = 0;
 const chips = el('div', 'hlp-chips');
 const form = el('form', 'hlp-form'); form.autocomplete = 'off';
@@ -87,6 +91,15 @@ function add(m, persist = true) {
   log.append(renderMsg(m));
   log.scrollTop = log.scrollHeight;
   if (persist) { state.msgs.push(m); save(); }
+  clearBtn.hidden = state.msgs.length === 0;
+}
+// Полная очистка: сообщения, сохранённая история и подсказки возвращаются в начальное состояние.
+function clearChat() {
+  state.msgs = []; save();
+  log.replaceChildren();
+  add({ r: 'bot', t: TEXT.intro }, false);
+  chips.hidden = false;
+  clearBtn.hidden = true;
 }
 
 // --- поиск ------------------------------------------------------------------------
@@ -129,6 +142,7 @@ async function ask(q) {
 
 // --- открытие / закрытие ----------------------------------------------------------
 function setOpen(open, focus = true) {
+  if (!open && !panel.hidden) clearChat(); // при закрытии окна чат удаляется
   state.open = open; save();
   panel.hidden = !open;
   fab.setAttribute('aria-expanded', String(open));
@@ -149,9 +163,11 @@ for (const s of SUGGEST) {
 }
 fab.addEventListener('click', () => setOpen(panel.hidden));
 closeBtn.addEventListener('click', () => setOpen(false));
+clearBtn.addEventListener('click', () => { clearChat(); input.focus(); });
 form.addEventListener('submit', (e) => { e.preventDefault(); const q = input.value; input.value = ''; ask(q); });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !panel.hidden) setOpen(false); });
 
 // восстановление после перехода на другую страницу
 for (const m of state.msgs) log.append(renderMsg(m));
+clearBtn.hidden = state.msgs.length === 0;
 if (state.open) setOpen(true, false);
