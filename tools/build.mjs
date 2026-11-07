@@ -238,7 +238,7 @@ function layout({ slug, title, body, crumb, desc, pager }) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(t)}</title>
 <meta name="description" content="${esc(desc || 'Сайт для студентов МГУ имени М. В. Ломоносова, изучающих отечественную историю: лекции, семинары, задания, результаты.')}">
-<meta name="theme-color" content="#7a1f2b">
+<meta name="theme-color" content="#0a4dff">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/style.css">
 </head>
