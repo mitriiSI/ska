@@ -271,7 +271,7 @@ function layout({ slug, title, body, crumb, desc, pager, script }) {
 <body>
 <a class="skip" href="#main">К содержанию</a>
 <header class="top">
-  <a class="masthead" href="index.html" aria-label="${SITE} — на главную"><span class="mast-t">${SITE}</span><span class="mast-s">К. Соловьёв, МГУ</span></a>
+  <a class="masthead" href="index.html" aria-label="${SITE} — на главную"><span class="mast-t">${SITE}</span><span class="mast-s">К. А. Соловьёв · МГУ имени М. В. Ломоносова</span></a>
   <div class="top-bar"><div class="top-in">
     <button class="burger" type="button" aria-controls="nav" aria-expanded="false" aria-label="Меню"><span></span><span></span><span></span></button>
     ${navHtml(slug)}
@@ -365,8 +365,20 @@ for (const sec of NAV) {
 
 // home
 {
-  const intro = pages['/'].blocks.find((b) => b.k === 'rt');
-  const body = `<section class="prose home-text">${cleanRich(intro.h).replace(/«методические материалы»|"методические материалы"/, '«<a href="metodicheskie-materialy.html">методические материалы</a>»').replace(/"Лекции"/, '«<a href="lekcii.html">Лекции</a>»').replace(/"объявления"/, '«<a href="obyavleniya.html">объявления</a>»')}</section>`;
+  const body = `<section class="prose home-text">
+<p class="lead">Добро пожаловать на учебный сайт К. А. Соловьёва для студентов МГУ имени М. В. Ломоносова, изучающих отечественную историю. Здесь собраны программа курса, презентации лекций, темы и литература семинаров, задания, рейтинг и результаты проверки работ.</p>
+<h2>Как найти нужное</h2>
+<ul>
+<li><a href="razdel-dopolnitelno.html">Дополнительно</a> — программа курса, методические материалы, лекции, полезные сайты и объявления.</li>
+<li><a href="razdel-speckurs.html">Спецкурс</a> — описание спецкурса, презентации лекций, семинары, темы выступлений на конференции и методика дебатов.</li>
+<li><a href="razdel-fgu.html">ФГУ</a> и <a href="razdel-mehmat.html">Мехмат</a> — материалы для вашей группы: темы и литература семинаров, задания, рейтинговая система, результаты проверки работ, итоги семестра и вопросы к экзамену.</li>
+<li><a href="razdel-kursovye.html">Курсовые работы</a> — темы, методика подготовки, распределение тем и индекс.</li>
+<li><a href="kontakty.html">Связаться</a> — контакты преподавателя и форма, через которую можно написать сообщение прямо с сайта.</li>
+</ul>
+<h2>Помощник по сайту</h2>
+<p>Если вы не знаете, где искать, нажмите круглую кнопку в правом нижнем углу и задайте вопрос своими словами: например, «как набираются баллы», «лекция 5» или «требования к статье». Помощник найдёт нужную страницу, строку таблицы или слайд презентации и подскажет, куда перейти. Он знает всё, что есть на сайте, включая тексты лекций и документов. Если ответа на сайте нет, он честно скажет об этом.</p>
+<p>О новостях и изменениях читайте на странице «<a href="obyavleniya.html">Объявления</a>».</p>
+</section>`;
   fs.writeFileSync(`${OUT}/index.html`, layout({ slug: 'index', title: SITE, body }));
 }
 
