@@ -20,7 +20,7 @@ const AUTHOR_GEN = 'К. А. Соловьёва';
 // ---- structure -------------------------------------------------------------
 // [wixPath, slug, title]
 const NAV = [
-  { title: 'Дополнительно', items: [
+  { title: 'Важное', items: [
     ['/programma', 'programma', 'Программа курса'],
     ['/metodicheskie-iaterialy', 'metodicheskie-materialy', 'Методические материалы'],
     ['/lekcii', 'lekcii', 'Лекции'],
@@ -212,7 +212,7 @@ function renderAnnouncements() {
 const flat = [];
 for (const s of NAV) for (const [p, slug, title] of s.items) flat.push({ p, slug, title, section: s.title });
 
-const SECTION_SLUG = { 'Дополнительно': 'razdel-dopolnitelno', 'Спецкурс': 'razdel-speckurs', 'ФГУ': 'razdel-fgu', 'Мехмат': 'razdel-mehmat', 'Курсовые работы': 'razdel-kursovye' };
+const SECTION_SLUG = { 'Важное': 'razdel-dopolnitelno', 'Спецкурс': 'razdel-speckurs', 'ФГУ': 'razdel-fgu', 'Мехмат': 'razdel-mehmat', 'Курсовые работы': 'razdel-kursovye' };
 const sectionOfSlug = (slug) => {
   const hub = Object.entries(SECTION_SLUG).find(([, v]) => v === slug);
   if (hub) return hub[0];
@@ -369,7 +369,7 @@ for (const sec of NAV) {
 <p class="lead">Добро пожаловать на учебный сайт К. А. Соловьёва для студентов МГУ имени М. В. Ломоносова, изучающих отечественную историю. Здесь собраны программа курса, презентации лекций, темы и литература семинаров, задания, рейтинг и результаты проверки работ.</p>
 <h2>Как найти нужное</h2>
 <ul>
-<li><a href="razdel-dopolnitelno.html">Дополнительно</a> — программа курса, методические материалы, лекции, полезные сайты и объявления.</li>
+<li><a href="razdel-dopolnitelno.html">Важное</a> — программа курса, методические материалы, лекции, полезные сайты и объявления.</li>
 <li><a href="razdel-speckurs.html">Спецкурс</a> — описание спецкурса, презентации лекций, семинары, темы выступлений на конференции и методика дебатов.</li>
 <li><a href="razdel-fgu.html">ФГУ</a> и <a href="razdel-mehmat.html">Мехмат</a> — материалы для вашей группы: темы и литература семинаров, задания, рейтинговая система, результаты проверки работ, итоги семестра и вопросы к экзамену.</li>
 <li><a href="razdel-kursovye.html">Курсовые работы</a> — темы, методика подготовки, распределение тем и индекс.</li>
