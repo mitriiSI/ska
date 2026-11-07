@@ -272,10 +272,10 @@ function layout({ slug, title, body, crumb, desc, pager, script }) {
 <a class="skip" href="#main">К содержанию</a>
 <header class="top">
   <a class="masthead" href="index.html" aria-label="${SITE} — на главную"><span class="mast-t">${SITE}</span><span class="mast-s">К. А. Соловьёв · МГУ имени М. В. Ломоносова</span></a>
-  <div class="top-bar"><div class="top-in">
+  ${slug === 'index' ? '' : `<div class="top-bar"><div class="top-in">
     <button class="burger" type="button" aria-controls="nav" aria-expanded="false" aria-label="Меню"><span></span><span></span><span></span></button>
     ${navHtml(slug)}
-  </div></div>
+  </div></div>`}
 </header>
 <main id="main">
 <div class="wrap content panel${slug === 'index' ? ' home-panel' : ''}">
@@ -285,8 +285,7 @@ ${pager || ''}
 </div>
 </main>
 <script src="assets/app.js"></script>
-<script type="module" src="assets/helper.js"></script>
-${slug === 'index' ? '<script type="module" src="assets/home.js"></script>\n' : ''}${script ? `<script src="assets/${script}"></script>\n` : ''}</body>
+${slug === 'index' ? '' : '<script type="module" src="assets/helper.js"></script>\n'}${slug === 'index' ? '<script type="module" src="assets/home.js"></script>\n' : ''}${script ? `<script src="assets/${script}"></script>\n` : ''}</body>
 </html>`;
 }
 
@@ -376,15 +375,14 @@ for (const sec of NAV) {
   const icon = (k) => `<svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[k]}</svg>`;
   const chip = (t) => `<button class="home-chip" type="button">${t}</button>`;
   const body = `<section class="home">
-<p class="home-lead">Учебный сайт для студентов МГУ имени М. В. Ломоносова: лекции, семинары, задания и результаты.</p>
+<p class="home-lead">Учебный сайт для студентов МГУ имени М. В. Ломоносова. Напишите, что нужно найти, и ответ появится сразу.</p>
 <form class="home-search" id="home-search" role="search">
-  <input id="home-q" name="q" type="search" autocomplete="off" maxlength="200" placeholder="Например: лекция 5" aria-label="Поиск по сайту">
+  <input id="home-q" name="q" type="search" autocomplete="off" maxlength="200" placeholder="Например: лекция 5" aria-label="Поиск и помощник по сайту">
   <button type="submit">Найти</button>
 </form>
 <div class="home-chips" aria-label="Быстрый поиск">${['Рейтинговая система', 'Лекции', 'Вопросы к экзамену', 'Как связаться'].map(chip).join('')}</div>
 <div class="home-results" id="home-results" role="region" aria-live="polite" aria-label="Результаты поиска" hidden></div>
 <div class="hub home-hub" id="home-hub">${SEC.map(([t, href, d, ic]) => `<a class="hub-tile" href="${href}">${icon(ic)}<span>${t}</span><small>${d}</small></a>`).join('')}</div>
-<p class="home-foot">Не нашли? <button class="home-ask-link" id="home-ask" type="button">Спросите помощника</button> — кнопка в правом нижнем углу.</p>
 </section>`;
   fs.writeFileSync(`${OUT}/index.html`, layout({ slug: 'index', title: SITE, body }));
 }

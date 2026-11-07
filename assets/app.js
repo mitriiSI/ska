@@ -2,6 +2,7 @@
   var burger = document.querySelector('.burger');
   var nav = document.getElementById('nav');
   var dds = Array.prototype.slice.call(document.querySelectorAll('.nav .dd'));
+  if (!burger || !nav) return; // на главной меню нет
 
   function closeAll(except) {
     dds.forEach(function (d) {

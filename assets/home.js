@@ -10,9 +10,19 @@ if (form) {
   const EXAMPLES = ['лекция 5', 'рейтинговая система', 'вопросы к экзамену', 'как связаться', 'требования к статье'];
   const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; };
 
-  function show(res, q) {
+  const SAY = {
+    hello: 'Здравствуйте! Напишите, что вы ищете на сайте.',
+    thanks: 'Пожалуйста! Если нужно что-то ещё, спрашивайте.',
+    bye: 'До свидания!',
+  };
+  function say(text) {
+    box.replaceChildren(el('p', 'home-say', text));
+    box.hidden = false; hub.hidden = true;
+  }
+  function show(res) {
     box.replaceChildren();
     if (res.kind === 'results') {
+      box.append(el('p', 'home-say', 'Вот что я нашёл на сайте:'));
       for (const r of res.results) {
         const a = el('a', 'home-res'); a.href = r.href;
         const top = el('div', 'home-res-top');
@@ -29,10 +39,9 @@ if (form) {
       }
     } else {
       const msg = el('div', 'home-none');
-      msg.append(el('p', '', 'Я не нашёл ответа на этот вопрос. Попробуйте назвать раздел, тему или номер лекции.'));
-      const b = el('button', 'home-ask', 'Спросить помощника'); b.type = 'button';
-      b.addEventListener('click', () => document.dispatchEvent(new CustomEvent('site-helper:ask', { detail: { q } })));
-      msg.append(b);
+      msg.append(el('p', '', 'Я не нашёл ответа на этот вопрос. Попробуйте назвать раздел, тему или номер лекции. Если не получится, напишите преподавателю.'));
+      const a = el('a', 'home-ask', 'Перейти к контактам'); a.href = 'kontakty.html';
+      msg.append(a);
       box.append(msg);
     }
     box.hidden = false; hub.hidden = true;
@@ -46,15 +55,15 @@ if (form) {
     try {
       const engine = await loadEngine();
       const res = engine.search(q, 4);
-      if (['hello', 'thanks', 'bye', 'empty'].includes(res.kind)) { reset(); return; }
-      show(res, q);
+      if (res.kind === 'empty') { reset(); return; }
+      if (SAY[res.kind]) { say(SAY[res.kind]); return; }
+      show(res);
     } catch { box.replaceChildren(el('p', 'home-none', 'Не удалось загрузить данные сайта. Обновите страницу.')); box.hidden = false; hub.hidden = true; }
   }
   input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(() => run(input.value), 130); });
   form.addEventListener('submit', (e) => { e.preventDefault(); clearTimeout(timer); run(input.value); });
   input.addEventListener('focus', () => { loadEngine().catch(() => {}); });
   for (const c of chips) c.addEventListener('click', () => { input.value = c.textContent; input.focus(); run(input.value); });
-  document.getElementById('home-ask').addEventListener('click', () => document.dispatchEvent(new CustomEvent('site-helper:ask', { detail: { q: input.value.trim() } })));
   document.addEventListener('keydown', (e) => {
     if (e.key === '/' && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement && document.activeElement.tagName)) { e.preventDefault(); input.focus(); }
     if (e.key === 'Escape' && document.activeElement === input && input.value) { input.value = ''; reset(); }
