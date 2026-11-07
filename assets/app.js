@@ -48,7 +48,7 @@
 // Liquid glass: блик следует за курсором
 (function () {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  var sel = '.card, .tile, .file, .lec, .pager a, .btn, .content > .news';
+  var sel = '.card, .tile, .file, .lec, .pager a, .btn, .content > .news, .hub-tile';
   document.addEventListener('pointermove', function (e) {
     var el = e.target.closest && e.target.closest(sel);
     if (!el) return;

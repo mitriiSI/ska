@@ -20,7 +20,7 @@ const AUTHOR_GEN = 'К. А. Соловьёва';
 // ---- structure -------------------------------------------------------------
 // [wixPath, slug, title]
 const NAV = [
-  { title: 'Главная', items: [
+  { title: 'Дополнительно', items: [
     ['/programma', 'programma', 'Программа курса'],
     ['/metodicheskie-iaterialy', 'metodicheskie-materialy', 'Методические материалы'],
     ['/lekcii', 'lekcii', 'Лекции'],
@@ -212,20 +212,45 @@ function renderAnnouncements() {
 const flat = [];
 for (const s of NAV) for (const [p, slug, title] of s.items) flat.push({ p, slug, title, section: s.title });
 
+const SECTION_SLUG = { 'Дополнительно': 'razdel-dopolnitelno', 'Спецкурс': 'razdel-speckurs', 'ФГУ': 'razdel-fgu', 'Мехмат': 'razdel-mehmat', 'Курсовые работы': 'razdel-kursovye' };
+const sectionOfSlug = (slug) => {
+  const hub = Object.entries(SECTION_SLUG).find(([, v]) => v === slug);
+  if (hub) return hub[0];
+  const it = flat.find((x) => x.slug === slug);
+  return it && it.section;
+};
+
 function navHtml(currentSlug) {
+  const cur = sectionOfSlug(currentSlug);
   let h = '<nav class="nav" id="nav" aria-label="Основное меню"><ul>';
   for (const s of NAV) {
-    const items = s.items.filter(([p]) => built.has(p));
-    if (!items.length) continue;
-    const home = s.title === 'Главная';
-    const active = items.some(([, slug]) => slug === currentSlug) || (home && currentSlug === 'index');
-    h += `<li class="dd${active ? ' active' : ''}"><button type="button" aria-expanded="false">${s.title}<svg viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button><ul>`;
-    if (home) h += `<li><a href="index.html"${currentSlug === 'index' ? ' aria-current="page"' : ''}>Главная</a></li>`;
-    for (const [, slug, title] of items) h += `<li><a href="${slug}.html"${slug === currentSlug ? ' aria-current="page"' : ''}>${title}</a></li>`;
-    h += '</ul></li>';
+    if (!s.items.some(([p]) => built.has(p))) continue;
+    h += `<li><a href="${SECTION_SLUG[s.title]}.html"${cur === s.title ? ' aria-current="page"' : ''}>${s.title}</a></li>`;
   }
   h += `<li><a href="kontakty.html"${currentSlug === 'kontakty' ? ' aria-current="page"' : ''}>Связаться</a></li>`;
   return h + '</ul></nav>';
+}
+
+const ICONS = {
+  book: '<path d="M4 4h12a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3z"/><path d="M8 8h7M8 12h7"/>',
+  slides: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M12 16v4M8 20h8"/>',
+  list: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6"/>',
+  chart: '<path d="M5 20V11M12 20V4M19 20v-6M3 20h18"/>',
+  check: '<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>',
+  question: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17v.5"/>',
+  globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',
+  megaphone: '<path d="M4 10v4h3l7 4V6L7 10z"/><path d="M18 9a4 4 0 0 1 0 6"/>',
+  users: '<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5M16 5a3 3 0 0 1 0 6M17 15c2.5.5 4 2.5 4 5"/>',
+  pen: '<path d="M4 20l1-4L16 5l3 3L8 19z"/>',
+  chat: '<path d="M4 5h16v11H9l-5 4z"/>',
+  file: '<path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5"/>',
+};
+function iconFor(slug) {
+  const rules = [[/lekcii|prezent/, 'slides'], [/voprosy/, 'question'], [/sajty/, 'globe'], [/obyavl/, 'megaphone'],
+    [/rejting/, 'chart'], [/itogi|rezultaty/, 'check'], [/gruppa/, 'users'], [/esse/, 'pen'], [/debaty|konferenc/, 'chat'],
+    [/seminary|zadaniya|temy|zanyatiya|raspredel|indeks/, 'list'], [/raboty/, 'file'], [/metodich|programma|literatura|metodika|speckurs/, 'book']];
+  const hit = rules.find(([re]) => re.test(slug));
+  return `<svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[hit ? hit[1] : 'file']}</svg>`;
 }
 
 function layout({ slug, title, body, crumb, desc, pager, script }) {
@@ -246,7 +271,7 @@ function layout({ slug, title, body, crumb, desc, pager, script }) {
 <body>
 <a class="skip" href="#main">К содержанию</a>
 <header class="top">
-  <a class="banner" href="index.html" aria-label="${SITE} — на главную"><span class="banner-t">${SITE}</span><span class="banner-s">Сайт ${AUTHOR_GEN.replace('Соловьёва', 'СОЛОВЬЁВА')}</span></a>
+  <a class="masthead" href="index.html" aria-label="${SITE} — на главную"><span class="mast-t">${SITE}</span><span class="mast-s">К. Соловьёв, МГУ</span></a>
   <div class="top-bar"><div class="top-in">
     <button class="burger" type="button" aria-controls="nav" aria-expanded="false" aria-label="Меню"><span></span><span></span><span></span></button>
     ${navHtml(slug)}
@@ -300,8 +325,17 @@ for (const [idx, it] of flat.entries()) {
   const i = sectionItems.indexOf(it);
   const prev = sectionItems[i - 1], next = sectionItems[i + 1];
   const pager = (prev || next) ? `<nav class="pager" aria-label="Соседние страницы">${prev ? `<a class="prev" href="${prev.slug}.html"><small>Назад</small>${prev.title}</a>` : '<span></span>'}${next ? `<a class="next" href="${next.slug}.html"><small>Далее</small>${next.title}</a>` : '<span></span>'}</nav>` : '';
-  fs.writeFileSync(`${OUT}/${it.slug}.html`, layout({ slug: it.slug, title: it.title, body: bodies[it.p], crumb: it.section === 'Главная' ? '<a href="index.html">Главная</a>' : `<a href="index.html">Главная</a> / ${it.section}`, pager }));
+  fs.writeFileSync(`${OUT}/${it.slug}.html`, layout({ slug: it.slug, title: it.title, body: bodies[it.p], crumb: `<a href="index.html">Главная</a> / <a href="${SECTION_SLUG[it.section]}.html">${it.section}</a>`, pager }));
   results.push(it.slug);
+}
+
+// section hubs: плитки-иконки для перехода вглубь
+for (const sec of NAV) {
+  const items = sec.items.filter(([p]) => built.has(p));
+  if (!items.length) continue;
+  const body = `<div class="hub">${items.map(([, slug, title]) => `<a class="hub-tile" href="${slug}.html">${iconFor(slug)}<span>${title}</span></a>`).join('')}</div>`;
+  const slug = SECTION_SLUG[sec.title];
+  fs.writeFileSync(`${OUT}/${slug}.html`, layout({ slug, title: sec.title, body, crumb: '<a href="index.html">Главная</a>' }));
 }
 
 // contacts
