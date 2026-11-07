@@ -415,20 +415,25 @@ body {
 @media (prefers-color-scheme: dark) { .hub-tile::before { background: radial-gradient(220px circle at var(--mx) var(--my), rgba(255, 255, 255, .14), transparent 65%); } }
 @media (max-width: 420px) { .hub { grid-template-columns: repeat(2, 1fr); gap: 12px; } .hub-tile { font-size: 15px; } }
 
-/* Таблицы в стиле сайта */
+/* Таблицы в стиле сайта: и написанные вручную, и вставленные из Word/Excel */
 .edited-page table, .page-editor table { width: 100%; margin: 22px 0; border-collapse: separate; border-spacing: 0; overflow: hidden; border: 1px solid var(--glass-edge-dim); border-radius: 20px;
   background-color: color-mix(in srgb, var(--glass-bg-strong) 75%, transparent); background-image: var(--glass-sheen);
   box-shadow: var(--glass-rim), var(--glass-shadow); font-size: 16px; }
 .edited-page caption, .page-editor caption { caption-side: top; text-align: left; padding: 0 4px 12px; font-weight: 600; color: var(--muted); }
-.edited-page th, .edited-page td, .page-editor th, .page-editor td { border: 0; border-bottom: 1px solid var(--line); padding: 13px 16px; vertical-align: middle; min-width: 0; text-align: left; }
-.edited-page thead th, .page-editor thead th { background-color: color-mix(in srgb, var(--accent) 16%, transparent); background-image: linear-gradient(180deg, rgba(255, 255, 255, .25), transparent); color: var(--ink); font-weight: 600; font-size: 14px; letter-spacing: .02em; border-bottom: 2px solid var(--orange); }
+.edited-page th, .edited-page td, .page-editor th, .page-editor td { border: 0; border-bottom: 1px solid var(--line); padding: 13px 16px; vertical-align: middle; min-width: 0; text-align: left; font-weight: 400; }
+.edited-page td p, .page-editor td p, .edited-page th p, .page-editor th p { margin: 0; }
+.edited-page td p + p, .page-editor td p + p { margin-top: .5em; }
+/* шапка: ячейки th, а у вставленных таблиц без th – первая строка */
+.edited-page th, .page-editor th,
+.edited-page table:not(:has(th)) tr:first-child td, .page-editor table:not(:has(th)) tr:first-child td {
+  background-color: color-mix(in srgb, var(--accent) 16%, transparent); background-image: linear-gradient(180deg, rgba(255, 255, 255, .25), transparent);
+  color: var(--ink); font-weight: 600; font-size: 14px; letter-spacing: .02em; border-bottom: 2px solid var(--orange); }
 .edited-page tbody tr:nth-child(even) td, .page-editor tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--accent) 6%, transparent); }
 .edited-page tbody tr:hover td { background: color-mix(in srgb, var(--orange) 10%, transparent); }
-.edited-page tbody tr:last-child td { border-bottom: 1px solid var(--line); }
-.edited-page tfoot td { font-weight: 700; border-bottom: 0; background: color-mix(in srgb, var(--accent) 12%, transparent); }
-.edited-page td:last-child, .edited-page th:last-child { text-align: center; font-variant-numeric: tabular-nums; }
-.edited-page td:last-child { white-space: nowrap; }
-.edited-page th:last-child { max-width: 190px; }
+.edited-page table:not(:has(th)) tr:first-child:hover td, .page-editor table:not(:has(th)) tr:first-child td { background-color: color-mix(in srgb, var(--accent) 16%, transparent); }
+.edited-page tr:last-child td, .edited-page tr:last-child th { border-bottom: 0; }
+.edited-page tfoot td { font-weight: 700; background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.edited-page td:last-child, .edited-page th:last-child { font-variant-numeric: tabular-nums; }
 
 @media (max-width: 1100px) {
   .top-bar .top-in { justify-content: flex-end; }
