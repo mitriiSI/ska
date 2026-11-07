@@ -521,10 +521,8 @@ body {
   background-color: var(--accent); background-image: linear-gradient(160deg, rgba(255, 255, 255, .32), transparent 55%), linear-gradient(180deg, transparent, var(--navy)); }
 @media (prefers-color-scheme: dark) { .home-search button { background-color: #1f5cff; } }
 .home-search button:hover { box-shadow: 0 6px 16px -4px color-mix(in srgb, var(--orange) 70%, transparent); }
-.home-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 14px 0 20px; }
-.home-chip { padding: 8px 14px; font: 500 14px/1 var(--sans); cursor: pointer; color: var(--ink); border-radius: 999px; border: 1px solid var(--glass-edge-dim); background-color: var(--glass-bg); box-shadow: var(--glass-rim); transition: transform .15s, border-color .15s; }
-.home-chip:hover { transform: translateY(-1px); color: var(--accent); border-color: var(--orange); }
 .home-hub[hidden], .home-results[hidden] { display: none; }
+.home-search { margin-bottom: 22px; }
 .home-hub { grid-template-columns: repeat(3, 1fr); gap: 14px; }
 .home-hub .hub-tile { aspect-ratio: auto; min-height: 138px; padding: 16px 12px; gap: 6px; }
 .home-hub .hub-tile svg { width: 34px; height: 34px; }
