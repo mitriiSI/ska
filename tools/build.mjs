@@ -259,7 +259,7 @@ function layout({ slug, title, body, crumb, desc, pager, script }) {
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'${script ? '; connect-src https://formsubmit.co' : ''}">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; connect-src 'self'${script ? ' https://formsubmit.co' : ''}">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(t)}</title>
@@ -285,6 +285,7 @@ ${pager || ''}
 </div>
 </main>
 <script src="assets/app.js"></script>
+<script type="module" src="assets/helper.js"></script>
 ${script ? `<script src="assets/${script}"></script>\n` : ''}</body>
 </html>`;
 }
@@ -369,4 +370,8 @@ for (const sec of NAV) {
   fs.writeFileSync(`${OUT}/index.html`, layout({ slug: 'index', title: SITE, body }));
 }
 
+import('./search-index.mjs').then(({ buildSearchIndex }) => {
+  const r = buildSearchIndex(ROOT);
+  console.log('search index:', r.pages, 'pages,', r.files, 'files,', r.chunks, 'chunks');
+});
 console.log('built:', results.length + 2, 'pages');

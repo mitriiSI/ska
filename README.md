@@ -16,6 +16,9 @@
 - `data/editable/*.json` — текущие тексты страниц группы 107 и курсовых; имеют приоритет над выгрузкой Wix.
 - `data/assetmap.json` — соответствие ссылок Wix локальным файлам.
 - `assets/style.css`, `assets/app.js` — оформление и меню.
+- `assets/helper.js`, `assets/search-core.js` — помощник по сайту (кнопка в углу). Ищет локально в браузере по `assets/search-index.json`.
+- `assets/search-index.json` — индекс всех страниц и файлов, собирается автоматически командой `npm run build` (`tools/search-index.mjs`).
+- `data/file-texts.json` — тексты презентаций и PDF для поиска. Обновляется вручную после добавления файлов в `files/`: `node tools/extract-file-texts.mjs` (для PDF нужен `pdftotext`), затем `npm run build`.
 - `files/` — презентации (.pptx) и PDF. `img/` — картинки.
 
 ## Запуск
