@@ -259,12 +259,21 @@ a:hover { text-decoration-thickness: 2px; }
 html { background-color: var(--bg); min-height: 100%; }
 body { background: transparent; }
 body::before {
-  content: ""; position: fixed; left: 0; right: 0; top: 0; height: 100vh; height: 100lvh; z-index: -1; pointer-events: none;
+  content: ""; position: fixed; left: 0; right: 0; top: 0; bottom: 0; z-index: -1; pointer-events: none;
   background:
-    radial-gradient(60vmax 50vmax at 8% -8%, color-mix(in srgb, var(--accent) 32%, transparent), transparent 62%),
-    radial-gradient(55vmax 45vmax at 98% 12%, color-mix(in srgb, var(--gold) 38%, transparent), transparent 60%),
-    radial-gradient(60vmax 50vmax at 30% 108%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 62%),
+    radial-gradient(90vmax 60vmax at 0% 0%, color-mix(in srgb, var(--accent) 38%, transparent), transparent 62%),
+    radial-gradient(80vmax 55vmax at 100% 6%, color-mix(in srgb, var(--gold) 36%, transparent), transparent 60%),
+    radial-gradient(90vmax 60vmax at 100% 100%, color-mix(in srgb, var(--accent) 34%, transparent), transparent 62%),
+    radial-gradient(80vmax 55vmax at 0% 96%, color-mix(in srgb, var(--gold) 30%, transparent), transparent 60%),
+    linear-gradient(180deg, transparent 35%, color-mix(in srgb, var(--accent) 10%, transparent) 100%),
     var(--bg);
+}
+/* Страница доходит до краёв экрана iPhone (viewport-fit=cover): отступаем от выреза и нижней панели */
+.masthead { padding-top: calc(clamp(10px, 1.6vw, 18px) + env(safe-area-inset-top, 0px)); }
+.content.panel { margin-bottom: calc(36px + env(safe-area-inset-bottom, 0px)); }
+@media (max-width: 560px) {
+  .masthead { padding-top: calc(8px + env(safe-area-inset-top, 0px)); }
+  .content.panel { margin-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
 }
 
 /* Общий материал */

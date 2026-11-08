@@ -271,7 +271,7 @@ function layout({ slug, title, body, crumb, desc, pager, script, extra }) {
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; connect-src 'self'${script ? ' https://formsubmit.co' : ''}${extra && extra.connect ? ' ' + extra.connect : ''}">${extra && extra.noindex ? '\n<meta name="robots" content="noindex">' : ''}
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>${esc(t)}</title>
 <meta name="description" content="${esc(desc || 'Сайт для студентов МГУ имени М. В. Ломоносова, изучающих отечественную историю: лекции, семинары, задания, результаты.')}">
 <meta name="theme-color" content="#0a4dff">
