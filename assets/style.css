@@ -591,3 +591,49 @@ body {
   .pager a { padding: 10px 12px; }
   .hlp-fab { width: 52px; height: 52px; }
 }
+
+/* Плотнее внутри страниц: заголовки, абзацы, карточки, лекции, контакты */
+.content > h2 { margin: 28px 0 10px; }
+.content > h2:first-child { margin-top: 0; }
+.prose h2 { margin: 1.1em 0 .45em; }
+.prose h3 { margin: 1em 0 .4em; }
+.prose p { margin-bottom: .75em; }
+.prose li { margin-bottom: .3em; }
+.lead { margin-bottom: 4px; }
+.card { padding: 18px 22px; }
+.card h2 { margin-bottom: 8px; }
+.shot { margin: 12px 0; }
+.edited-page table, .page-editor table { margin: 16px 0; }
+.contact.tech { margin-top: 12px; }
+.cform { margin: 12px 0; }
+
+@media (max-width: 560px) {
+  body { font-size: 16px; line-height: 1.55; }
+  .content > h2 { margin: 20px 0 8px; font-size: 22px; }
+  .prose h2 { margin: .9em 0 .4em; font-size: 22px; }
+  .prose h3 { font-size: 18px; }
+  .lead { font-size: 16.5px; line-height: 1.5; }
+  .card { padding: 14px 14px; border-radius: 18px; }
+  .card h2 { font-size: 20px; margin-bottom: 6px; }
+  .panel .card { box-shadow: var(--glass-rim); }
+  .contact { gap: 12px; }
+  .contact .portrait { width: 130px; border-radius: 12px; }
+  .contact dl { gap: 2px 12px; }
+  .contact dd { margin-bottom: 8px; }
+  .contact.tech { margin-top: 8px; }
+  .cform label { margin-bottom: 10px; }
+  .cform input, .cform textarea { padding: 10px 12px; }
+  .cform textarea { min-height: 110px; }
+  .lec-grid { gap: 8px; grid-template-columns: repeat(2, 1fr); }
+  .lec { padding: 10px 12px; border-radius: 16px; }
+  .lec-n { font-size: 26px; }
+  .lec-t { font-size: 14px; }
+  .files { gap: 8px; margin: 10px 0; }
+  .file { padding: 10px 12px; gap: 10px; border-radius: 16px; }
+  .file-ico { width: 40px; height: 40px; }
+  .news li { padding: 10px 0; }
+  .shot { margin: 8px 0; }
+  .edited-page table, .page-editor table { margin: 12px 0; }
+  .edited-page th, .edited-page td { padding: 9px 10px; }
+  .prose p { margin-bottom: .65em; }
+}
