@@ -637,3 +637,29 @@ body {
   .edited-page th, .edited-page td { padding: 9px 10px; }
   .prose p { margin-bottom: .65em; }
 }
+
+/* Верхняя строка: «Назад», компактные разделы, на телефоне – маленькое меню */
+.top-bar .top-in { position: relative; display: flex; align-items: center; justify-content: center; min-height: 44px; }
+.back { position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; display: grid; place-items: center; color: var(--ink); text-decoration: none; border-radius: 50%; border: 1px solid var(--glass-edge-dim);
+  background-color: var(--glass-bg-strong); background-image: var(--glass-sheen);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+  box-shadow: var(--glass-rim), var(--glass-shadow); transition: transform .15s, color .15s; }
+.back:hover { color: var(--orange); transform: translateY(-50%) translateX(-2px); }
+.back:active { transform: translateY(-50%) scale(.94); }
+.nav > ul { gap: 8px; }
+.nav a { padding: 9px 16px; font: 500 14.5px/1 var(--sans); }
+@media (max-width: 1100px) {
+  .top-bar .top-in { justify-content: space-between; }
+  .back { position: static; transform: none; flex: none; }
+  .back:hover, .back:active { transform: none; }
+  .burger { margin: 0; flex: none; width: 40px; height: 40px; }
+  /* маленькое окошко под кнопкой меню вместо панели на всю ширину */
+  .nav { position: absolute; top: calc(100% + 6px); left: auto; right: 0; width: min(250px, 100%); padding: 6px; border-radius: 20px; border: 1px solid var(--glass-edge-dim);
+    background-color: color-mix(in srgb, var(--surface) 80%, transparent); background-image: var(--glass-sheen);
+    -webkit-backdrop-filter: blur(22px) saturate(1.8); backdrop-filter: blur(22px) saturate(1.8);
+    box-shadow: var(--glass-rim), 0 18px 40px -12px rgba(11, 27, 68, .45); }
+  .nav > ul { gap: 2px; align-items: stretch; flex-direction: column; flex-wrap: nowrap; }
+  .nav a { display: block; text-align: left; padding: 12px 14px; font-size: 16px; border: 0; border-radius: 14px; background: none; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; transform: none; }
+  .nav a:hover { background-color: color-mix(in srgb, var(--accent) 12%, transparent); transform: none; }
+  .nav a[aria-current="page"] { color: var(--accent); background-color: color-mix(in srgb, var(--accent) 14%, transparent); background-image: none; box-shadow: inset 3px 0 0 var(--orange); border: 0; font-weight: 600; }
+}
