@@ -1,5 +1,6 @@
 import PageContent from './page-content.js';
 import { safeAttachmentName } from './content-policy.js';
+import * as JC from './journal-core.js';
 
 (function () {
   'use strict';
@@ -14,7 +15,7 @@ import { safeAttachmentName } from './content-policy.js';
     return;
   }
 
-  var OWNER = 'dur0vd', REPO = 'ska_hist', BRANCH = 'main';
+  var OWNER = 'mitriiSI', REPO = 'ska', BRANCH = 'main';
   var API = 'https://api.github.com/repos/' + OWNER + '/' + REPO + '/contents/';
   var KEY = 'ska_admin_key';
   var MAX_MB = 50;
@@ -169,6 +170,7 @@ import { safeAttachmentName } from './content-policy.js';
         pane.hidden = pane.id !== 'tab-' + b.dataset.tab;
       });
       if (b.dataset.tab === 'pages' && !pageLoaded) loadPage();
+      if (b.dataset.tab === 'journal' && !J.loaded) loadJournal();
     });
   });
 
@@ -540,6 +542,211 @@ import { safeAttachmentName } from './content-policy.js';
   window.addEventListener('beforeunload', function (e) {
     if (pageDirty || pageWorking) { e.preventDefault(); e.returnValue = ''; }
   });
+
+  // ---------- журнал баллов ----------
+  var ENDPOINT_RE = /^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/;
+  var J = { data: null, sha: null, dirty: false, loaded: false, busy: false, codes: {}, self: [], open: {}, adminKey: '' };
+  var JPATH = 'assets/journal.json';
+
+  function jEl(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; }
+  function jMark(dirty) {
+    J.dirty = dirty;
+    $('j-save').disabled = !dirty || J.busy;
+    $('j-state').textContent = dirty ? 'Есть неопубликованные изменения. Нажмите «Опубликовать журнал».' : 'Все изменения опубликованы.';
+  }
+  function jEndpoint() { var u = (J.data && J.data.endpoint) || ''; return ENDPOINT_RE.test(u) ? u : ''; }
+  function jTotal(st) { return JC.totalOf(st, J.self); }
+  function jFind(sid) { return J.data.students.filter(function (s) { return s.id === sid; })[0]; }
+
+  function jLoadSelf() {
+    var url = jEndpoint();
+    J.self = [];
+    if (!url) { $('j-link').textContent = 'Сервер самостоятельного ввода не подключён.'; return Promise.resolve(); }
+    $('j-link').textContent = 'Проверяю связь с сервером…';
+    return fetch(url + '?action=list', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (d) {
+      if (!d || !d.ok) throw new Error('bad');
+      J.self = d.entries || [];
+      $('j-link').textContent = 'Сервер подключён. Баллов, внесённых студентами: ' + J.self.length + ' записей.';
+    }).catch(function () { $('j-link').textContent = 'Не удалось связаться с сервером. Проверьте адрес и что развёртывание открыто для всех.'; });
+  }
+
+  function loadJournal() {
+    $('j-state').textContent = 'Загружаю журнал…';
+    return readJson(JPATH, JC.emptyJournal()).then(function (r) {
+      J.data = Object.assign(JC.emptyJournal(), r.data);
+      J.data.students = J.data.students || [];
+      J.sha = r.sha; J.loaded = true;
+      $('j-endpoint').value = J.data.endpoint || '';
+      jMark(false);
+      return jLoadSelf();
+    }).then(jRender).catch(function (err) { $('j-state').textContent = 'Не удалось загрузить журнал.'; status('err', err.message); });
+  }
+
+  function jAddPoints(st, values) {
+    values.forEach(function (v) { st.entries.push({ id: 'e' + JC.randomHex(8), pts: v, at: new Date().toISOString() }); });
+    jMark(true);
+  }
+
+  function jRender(focusSid) {
+    var list = $('j-list');
+    list.replaceChildren();
+    var students = J.data.students.slice().sort(JC.byName);
+    $('j-count').textContent = students.length ? 'Участников: ' + students.length : '';
+    if (!students.length) { list.append(jEl('p', 'hint', 'Пока никого нет. Добавьте фамилии выше.')); return; }
+    students.forEach(function (st) {
+      var total = jTotal(st), g = JC.gradeOf(total);
+      var row = jEl('div', 'j-row ' + (g ? g.key : 'g0'));
+      var top = jEl('div', 'j-top');
+      var name = jEl('input', 'j-name'); name.type = 'text'; name.value = st.name; name.maxLength = 80; name.setAttribute('aria-label', 'Фамилия'); name.dataset.sid = st.id;
+      var sum = jEl('span', 'j-total'); sum.append(document.createTextNode(JC.formatPoints(total) + ' '), jEl('span', 'jr-badge ' + (g ? g.key : 'g0'), g ? String(g.grade) : '–'));
+      top.append(name, sum);
+
+      var add = jEl('div', 'j-add');
+      var pts = jEl('input', 'j-pts'); pts.type = 'text'; pts.inputMode = 'decimal'; pts.placeholder = 'Баллы'; pts.setAttribute('aria-label', 'Баллы для ' + st.name); pts.dataset.sid = st.id;
+      var ok = jEl('button', 'btn j-ok', 'ОК'); ok.type = 'button'; ok.dataset.act = 'add'; ok.dataset.sid = st.id;
+      add.append(pts, ok);
+
+      var acts = jEl('div', 'j-acts');
+      var hasCode = !!st.codeHash;
+      [['hist', 'История' + (st.entries.length ? ' (' + st.entries.length + ')' : '')], ['code', hasCode ? 'Новый код' : 'Выдать код'], ['del', 'Удалить']].forEach(function (a) {
+        var b = jEl('button', 'del', a[1]); b.type = 'button'; b.dataset.act = a[0]; b.dataset.sid = st.id; acts.append(b);
+      });
+      if (!hasCode) acts.append(jEl('span', 'j-nocode', 'нет кода'));
+      row.append(top, add, acts);
+
+      if (J.open[st.id]) {
+        var hist = jEl('div', 'j-hist');
+        var mine = J.self.filter(function (e) { return e.sid === st.id; });
+        if (!st.entries.length && !mine.length) hist.append(jEl('p', 'hint', 'Записей пока нет.'));
+        st.entries.forEach(function (e) {
+          var li = jEl('div', 'j-entry'); li.append(jEl('b', '', (e.pts > 0 ? '+' : '') + JC.formatPoints(e.pts)), jEl('span', '', e.at ? new Date(e.at).toLocaleString('ru-RU') : ''));
+          var d = jEl('button', 'del', 'Удалить'); d.type = 'button'; d.dataset.act = 'delentry'; d.dataset.sid = st.id; d.dataset.eid = e.id; li.append(d); hist.append(li);
+        });
+        mine.forEach(function (e) {
+          var li = jEl('div', 'j-entry self'); li.append(jEl('b', '', '+' + JC.formatPoints(e.pts)), jEl('span', '', 'внёс студент' + (e.ts ? ', ' + new Date(e.ts).toLocaleString('ru-RU') : '')));
+          var d = jEl('button', 'del', 'Удалить'); d.type = 'button'; d.dataset.act = 'delself'; d.dataset.eid = e.id; li.append(d); hist.append(li);
+        });
+        row.append(hist);
+      }
+      list.append(row);
+    });
+    if (focusSid) { var f = list.querySelector('.j-pts[data-sid="' + focusSid + '"]'); if (f) f.focus(); }
+  }
+
+  function jShowCodes() {
+    var lines = J.data.students.filter(function (s) { return J.codes[s.id]; }).sort(JC.byName).map(function (s) { return s.name + ' — ' + J.codes[s.id]; });
+    $('j-codes-box').hidden = !lines.length;
+    $('j-codes').value = lines.join('\n');
+    $('j-codes').rows = Math.min(14, Math.max(3, lines.length));
+  }
+  function jNewCode(st) {
+    var code = JC.makeCode(), salt = JC.randomHex(16);
+    return JC.hashCode(salt, code).then(function (h) { st.salt = salt; st.codeHash = h; J.codes[st.id] = code; jMark(true); });
+  }
+
+  $('j-list').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-act]');
+    if (!b || !J.loaded) return;
+    var st = b.dataset.sid && jFind(b.dataset.sid);
+    switch (b.dataset.act) {
+      case 'add': {
+        var input = $('j-list').querySelector('.j-pts[data-sid="' + st.id + '"]');
+        var p = JC.parsePoints(input.value);
+        if (p.error) { status('err', p.error); input.focus(); return; }
+        $('status').hidden = true;
+        jAddPoints(st, p.values); jRender(st.id); break;
+      }
+      case 'hist': J.open[st.id] = !J.open[st.id]; jRender(); break;
+      case 'code':
+        if (st.codeHash && !confirm('Выдать новый код для «' + st.name + '»? Старый код перестанет работать после публикации.')) return;
+        jNewCode(st).then(function () { jShowCodes(); jRender(); status('ok', 'Код для «' + st.name + '» создан. Скопируйте его ниже: потом посмотреть его будет нельзя.'); }); break;
+      case 'del':
+        if (!confirm('Удалить «' + st.name + '» из журнала вместе с баллами?')) return;
+        J.data.students = J.data.students.filter(function (s) { return s.id !== st.id; }); delete J.codes[st.id]; jMark(true); jShowCodes(); jRender(); break;
+      case 'delentry':
+        st.entries = st.entries.filter(function (x) { return x.id !== b.dataset.eid; }); jMark(true); jRender(); break;
+      case 'delself': {
+        var key = $('j-adminkey').value;
+        if (!key) { status('err', 'Чтобы удалить запись студента, введите ключ сервера в блоке «Самостоятельный ввод».'); return; }
+        b.disabled = true;
+        fetch(jEndpoint(), { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'remove', id: b.dataset.eid, adminKey: key }) })
+          .then(function (r) { return r.json(); }).then(function (d) {
+            if (!d.ok) throw new Error(d.error === 'admin' ? 'Ключ сервера не подошёл.' : 'Не удалось удалить запись.');
+            return jLoadSelf();
+          }).then(function () { jRender(); status('ok', 'Запись студента удалена.'); })
+          .catch(function (err) { b.disabled = false; status('err', err.message); });
+        break;
+      }
+    }
+  });
+  $('j-list').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && e.target.classList.contains('j-pts')) { e.preventDefault(); var ok = $('j-list').querySelector('.j-ok[data-sid="' + e.target.dataset.sid + '"]'); if (ok) ok.click(); }
+  });
+  $('j-list').addEventListener('change', function (e) {
+    if (!e.target.classList.contains('j-name')) return;
+    var st = jFind(e.target.dataset.sid), name = JC.cleanName(e.target.value);
+    var dup = J.data.students.some(function (s) { return s.id !== st.id && s.name.toLowerCase() === name.toLowerCase(); });
+    if (!name || dup) { status('err', dup ? 'Такая фамилия уже есть.' : 'Фамилия не может быть пустой.'); e.target.value = st.name; return; }
+    st.name = name; jMark(true); jRender(); 
+  });
+
+  $('j-add-names').addEventListener('click', function () {
+    if (!J.loaded) return;
+    var names = JC.parseNames($('j-names').value, J.data.students.map(function (s) { return s.name; }));
+    if (!names.length) { status('err', 'Новых фамилий нет: введите их по одной в строке.'); return; }
+    names.forEach(function (n) { J.data.students.push({ id: 's' + JC.randomHex(6), name: n, salt: '', codeHash: '', entries: [] }); });
+    $('j-names').value = ''; jMark(true); jRender();
+    status('ok', 'Добавлено участников: ' + names.length + '. Теперь выдайте им коды (кнопка «Выдать коды всем») и опубликуйте журнал.');
+  });
+
+  $('j-bulk-apply').addEventListener('click', function () {
+    if (!J.loaded) return;
+    var r = JC.parseBulk($('j-bulk').value, J.data.students);
+    r.matched.forEach(function (m) { jAddPoints(jFind(m.sid), m.values); });
+    var rep = $('j-bulk-report'); rep.replaceChildren();
+    if (r.matched.length) rep.append(jEl('p', 'ok', 'Внесено записей: ' + r.matched.length + '.'));
+    r.problems.forEach(function (p) { rep.append(jEl('p', 'bad', '«' + p.line + '» — ' + p.why)); });
+    $('j-bulk').value = r.problems.map(function (p) { return p.line; }).join('\n');
+    jRender();
+  });
+
+  $('j-codes-all').addEventListener('click', function () {
+    if (!J.loaded) return;
+    var need = J.data.students.filter(function (s) { return !s.codeHash; });
+    if (!need.length) { status('ok', 'У всех участников уже есть коды.'); return; }
+    Promise.all(need.map(jNewCode)).then(function () { jShowCodes(); jRender(); status('ok', 'Коды созданы: ' + need.length + '. Скопируйте список ниже и раздайте. Потом посмотреть их будет нельзя.'); });
+  });
+  $('j-codes-copy').addEventListener('click', function () {
+    var box = $('j-codes');
+    var done = function () { status('ok', 'Список кодов скопирован.'); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(box.value).then(done, function () { box.select(); });
+    else box.select();
+  });
+
+  $('j-endpoint').addEventListener('change', function () {
+    if (!J.loaded) return;
+    var v = $('j-endpoint').value.trim();
+    if (v && !ENDPOINT_RE.test(v)) { status('err', 'Адрес должен начинаться с https://script.google.com/macros/s/ и заканчиваться на /exec.'); $('j-endpoint').value = J.data.endpoint || ''; return; }
+    J.data.endpoint = v; jMark(true); jLoadSelf().then(function () { jRender(); });
+  });
+
+  $('j-save').addEventListener('click', function () {
+    if (!J.loaded || !J.dirty || J.busy) return;
+    J.data.updated = new Date().toISOString();
+    J.data.max = JC.MAX_POINTS;
+    J.busy = true; $('j-save').disabled = true; status('busy', 'Публикую журнал…');
+    writeJson(JPATH, J.data, J.sha, 'Журнал баллов: обновление').then(function (r) {
+      J.sha = r.content.sha; J.busy = false; jMark(false);
+      status('ok', 'Журнал опубликован. На сайте он обновится через 1–2 минуты.');
+    }).catch(function (err) {
+      J.busy = false; jMark(true); status('err', err.message + ' Ваши изменения остались в редакторе.');
+    });
+  });
+  $('j-reload').addEventListener('click', function () {
+    if (J.dirty && !confirm('Загрузить опубликованный журнал и отменить несохранённые изменения?')) return;
+    J.codes = {}; jShowCodes(); loadJournal();
+  });
+  window.addEventListener('beforeunload', function (e) { if (J.dirty) { e.preventDefault(); e.returnValue = ''; } });
 
   // ---------- старт ----------
   if (token) {

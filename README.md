@@ -18,6 +18,7 @@
 - `assets/style.css`, `assets/app.js` — оформление и меню.
 - `assets/helper.js`, `assets/search-core.js` — помощник по сайту (кнопка в углу). Ищет локально в браузере по `assets/search-index.json`.
 - `assets/home.js`, `assets/engine.js` — поиск на главной (в нём же ответы помощника): на главной нет верхнего меню и кнопки помощника, разделы лежат плитками.
+- `assets/journal.json`, `assets/journal.js`, `assets/journal-core.js` — журнал баллов ФГУ (страница `fgu-zhurnal.html`, вкладка «Журнал баллов» в `admin.html`). Студенческий ввод по коду принимает `tools/journal-apps-script.gs` (Google Apps Script), подключение описано в `instrukciya.html`.
 - `assets/search-index.json` — индекс всех страниц и файлов, собирается автоматически командой `npm run build` (`tools/search-index.mjs`).
 - `data/file-texts.json` — тексты презентаций и PDF для поиска. Обновляется вручную после добавления файлов в `files/`: `node tools/extract-file-texts.mjs` (для PDF нужен `pdftotext`), затем `npm run build`.
 - `files/` — презентации (.pptx) и PDF. `img/` — картинки.

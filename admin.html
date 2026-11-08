@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src https://api.github.com; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src https://api.github.com https://script.google.com https://script.googleusercontent.com; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <title>Управление сайтом — Отечественная история</title>
 <meta name="theme-color" content="#7a1f2b">
@@ -44,6 +44,7 @@
       <button role="tab" aria-selected="true" data-tab="news">Объявления</button>
       <button role="tab" aria-selected="false" data-tab="lec">Лекции</button>
       <button role="tab" aria-selected="false" data-tab="pages">Страницы</button>
+      <button role="tab" aria-selected="false" data-tab="journal">Журнал баллов</button>
     </div>
 
     <!-- Объявления -->
@@ -99,6 +100,60 @@
       <div class="card">
         <h2>Загруженные лекции</h2>
         <div id="lec-list"></div>
+      </div>
+    </section>
+
+    <!-- Журнал баллов -->
+    <section id="tab-journal" class="tabpane jr" hidden>
+      <div class="card">
+        <h2>Журнал баллов ФГУ</h2>
+        <p>Максимум 138 баллов. Пятёрка: от 90, четвёрка: 75–89, тройка: 50–74. Журнал виден на сайте в разделе «ФГУ».</p>
+        <p id="j-state" class="hint" aria-live="polite">Откройте вкладку, чтобы загрузить журнал.</p>
+        <div class="editor-actions">
+          <button id="j-save" class="btn" type="button" disabled>Опубликовать журнал</button>
+          <button id="j-reload" class="link" type="button">Загрузить заново</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Участники</h2>
+        <label for="j-names">Добавить фамилии <span class="opt">(по одной в строке)</span></label>
+        <textarea id="j-names" rows="4" placeholder="Иванов Иван&#10;Петрова Анна"></textarea>
+        <button id="j-add-names" class="del" type="button">Добавить в журнал</button>
+      </div>
+
+      <div class="card">
+        <h2>Баллы <span id="j-count" class="opt"></span></h2>
+        <p class="hint">В строке участника введите число и нажмите «ОК» или Enter. Баллы суммируются. Можно ввести несколько чисел через пробел или запятую (5 3 10), минус означает штраф. Фамилию можно исправить прямо в строке.</p>
+        <div id="j-list" class="j-list"></div>
+        <details class="page-upload">
+          <summary>Внести баллы сразу нескольким</summary>
+          <label for="j-bulk">По одной строке: фамилия и число</label>
+          <textarea id="j-bulk" rows="5" placeholder="Иванов 5&#10;Петрова 3, 4"></textarea>
+          <button id="j-bulk-apply" class="del" type="button">Внести</button>
+          <div id="j-bulk-report" class="j-report" aria-live="polite"></div>
+        </details>
+      </div>
+
+      <div class="card">
+        <h2>Коды для студентов</h2>
+        <p>Код выдаётся каждому участнику. По коду студент сам вносит себе баллы на странице журнала. Код виден только сразу после создания: потом его восстановить нельзя, можно выдать новый.</p>
+        <button id="j-codes-all" class="del" type="button">Выдать коды всем, у кого их нет</button>
+        <div id="j-codes-box" hidden>
+          <label for="j-codes">Новые коды</label>
+          <textarea id="j-codes" rows="4" readonly></textarea>
+          <button id="j-codes-copy" class="del" type="button">Скопировать список</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Самостоятельный ввод баллов студентами</h2>
+        <p>Нужен небольшой сервер на Google Таблицах. Как его подключить: раздел «Журнал баллов» в <a href="instrukciya.html">инструкции</a>.</p>
+        <label for="j-endpoint">Адрес сервера <span class="opt">(заканчивается на /exec)</span></label>
+        <input id="j-endpoint" type="text" autocomplete="off" spellcheck="false" placeholder="https://script.google.com/macros/s/…/exec">
+        <p id="j-link" class="hint" aria-live="polite">Сервер самостоятельного ввода не подключён.</p>
+        <label for="j-adminkey">Ключ сервера <span class="opt">(нужен только чтобы удалять записи студентов, хранится в этой вкладке)</span></label>
+        <input id="j-adminkey" type="password" autocomplete="off" spellcheck="false">
       </div>
     </section>
 

@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 import * as cheerio from 'cheerio';
 import { sanitizePage } from './page-content.mjs';
+import { GRADES, MAX_POINTS } from '../assets/journal-core.js';
 
 const OUT = ROOT;
 // Версия браузерной очистки из lockfile, без стороннего CDN.
@@ -36,6 +37,7 @@ const NAV = [
     ['/дебаты-методика', 'speckurs-debaty', 'Дебаты: методика'],
   ]},
   { title: 'ФГУ', items: [
+    ['/zhurnal-ballov', 'fgu-zhurnal', 'Журнал баллов'],
     ['/rejtingovaya-sistema', 'fgu-rejtingovaya-sistema', 'Рейтинговая система'],
     ['/spiski-grupp', 'fgu-gruppa-107', 'Группа 107'],
     ['/zadaniya', 'fgu-zadaniya', 'Задания'],
@@ -245,10 +247,11 @@ const ICONS = {
   pen: '<path d="M4 20l1-4L16 5l3 3L8 19z"/>',
   chat: '<path d="M4 5h16v11H9l-5 4z"/>',
   file: '<path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5"/>',
+  trophy: '<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3"/>',
 };
 function iconFor(slug) {
   const rules = [[/lekcii|prezent/, 'slides'], [/voprosy/, 'question'], [/sajty/, 'globe'], [/obyavl/, 'megaphone'],
-    [/rejting/, 'chart'], [/itogi|rezultaty/, 'check'], [/gruppa/, 'users'], [/esse/, 'pen'], [/debaty|konferenc/, 'chat'],
+    [/zhurnal/, 'trophy'], [/rejting/, 'chart'], [/itogi|rezultaty/, 'check'], [/gruppa/, 'users'], [/esse/, 'pen'], [/debaty|konferenc/, 'chat'],
     [/seminary|zadaniya|temy|zanyatiya|raspredel|indeks/, 'list'], [/raboty/, 'file'], [/metodich|programma|literatura|metodika|speckurs/, 'book']];
   const hit = rules.find(([re]) => re.test(slug));
   return `<svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[hit ? hit[1] : 'file']}</svg>`;
@@ -260,13 +263,13 @@ function backHref(slug) {
   return it && SECTION_SLUG[it.section] ? SECTION_SLUG[it.section] + '.html' : 'index.html';
 }
 
-function layout({ slug, title, body, crumb, desc, pager, script }) {
+function layout({ slug, title, body, crumb, desc, pager, script, extra }) {
   const t = slug === 'index' ? `${SITE} — сайт ${AUTHOR_GEN}` : `${title} — ${SITE}`;
   return `<!doctype html>
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; connect-src 'self'${script ? ' https://formsubmit.co' : ''}">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; connect-src 'self'${script ? ' https://formsubmit.co' : ''}${extra && extra.connect ? ' ' + extra.connect : ''}">${extra && extra.noindex ? '\n<meta name="robots" content="noindex">' : ''}
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(t)}</title>
@@ -293,13 +296,39 @@ ${pager || ''}
 </div>
 </main>
 <script src="assets/app.js"></script>
-${slug === 'index' ? '' : '<script type="module" src="assets/helper.js"></script>\n'}${slug === 'index' ? '<script type="module" src="assets/home.js"></script>\n' : ''}${script ? `<script src="assets/${script}"></script>\n` : ''}</body>
+${slug === 'index' ? '' : '<script type="module" src="assets/helper.js"></script>\n'}${extra && extra.module ? `<script type="module" src="assets/${extra.module}"></script>\n` : ''}${slug === 'index' ? '<script type="module" src="assets/home.js"></script>\n' : ''}${script ? `<script src="assets/${script}"></script>\n` : ''}</body>
 </html>`;
 }
 
 // ---- build pages ------------------------------------------------------------
 const built = new Set();
 const results = [];
+// Журнал баллов: оболочка страницы; таблицу рисует assets/journal.js из assets/journal.json.
+function journalShell() {
+  const legend = GRADES.map((g) => `<li class="${g.key}"><b>${g.grade}</b><span>${g.range} баллов</span></li>`).join('') + '<li class="g0"><b>–</b><span>менее 50</span></li>';
+  return `<div class="jr" id="jr">
+<p class="jr-max">Максимум: <strong>${MAX_POINTS} баллов</strong>. Оценка зависит от суммы.</p>
+<ul class="jr-legend" aria-label="Оценки по сумме баллов">${legend}</ul>
+<div class="jr-tools" id="jr-tools" hidden>
+  <input id="jr-filter" type="search" placeholder="Найти фамилию" autocomplete="off" aria-label="Найти фамилию">
+  <div class="jr-sort" role="group" aria-label="Порядок"><button type="button" data-sort="name" aria-pressed="true">По алфавиту</button><button type="button" data-sort="pts" aria-pressed="false">По баллам</button></div>
+</div>
+<div id="jr-body" aria-live="polite"><p class="jr-empty">Загружаю журнал…</p></div>
+<noscript><p>Чтобы увидеть журнал, включите JavaScript.</p></noscript>
+<section class="jr-self" id="jr-self" hidden>
+  <h2>Внести свои баллы</h2>
+  <p class="jr-hint">Выберите себя, введите код, который выдал преподаватель, и число баллов. Они сразу появятся в журнале.</p>
+  <form id="jr-form" autocomplete="off">
+    <label for="jr-who">Фамилия</label><select id="jr-who" required></select>
+    <label for="jr-code">Код</label><input id="jr-code" type="text" inputmode="text" autocapitalize="characters" spellcheck="false" placeholder="XXXXX-XXXXX" required>
+    <label for="jr-pts">Баллы</label><input id="jr-pts" type="number" inputmode="numeric" min="1" max="30" step="1" required>
+    <button class="btn" type="submit">ОК</button>
+    <p id="jr-msg" class="jr-msg" role="status" aria-live="polite"></p>
+  </form>
+</section>
+</div>`;
+}
+
 function pageBody(p) {
   const editable = ROOT + '/data/editable/' + pathToSlug[p] + '.json';
   if (exists('data/editable/' + pathToSlug[p] + '.json')) {
@@ -307,6 +336,7 @@ function pageBody(p) {
     const content = sanitizePage(data.html);
     return '<div class="prose edited-page">' + (content.trim() || '<p>Материалы ещё не размещены.</p>') + '</div>';
   }
+  if (p === '/zhurnal-ballov') return journalShell();
   const pg = pages[p];
   if (!pg) return '';
   if (p === '/lekcii') return renderLectures();
@@ -314,6 +344,7 @@ function pageBody(p) {
   if (p === '/obyavleniya') return renderAnnouncements();
   return renderGeneric(pg.blocks);
 }
+const PAGE_EXTRA = { 'fgu-zhurnal': { module: 'journal.js', connect: 'https://script.google.com https://script.googleusercontent.com', noindex: true } };
 const bodies = {};
 for (const it of flat) {
   const b = pageBody(it.p);
@@ -327,7 +358,7 @@ for (const [idx, it] of flat.entries()) {
   const i = sectionItems.indexOf(it);
   const prev = sectionItems[i - 1], next = sectionItems[i + 1];
   const pager = (prev || next) ? `<nav class="pager" aria-label="Соседние страницы">${prev ? `<a class="prev" href="${prev.slug}.html"><small>Назад</small>${prev.title}</a>` : '<span></span>'}${next ? `<a class="next" href="${next.slug}.html"><small>Далее</small>${next.title}</a>` : '<span></span>'}</nav>` : '';
-  fs.writeFileSync(`${OUT}/${it.slug}.html`, layout({ slug: it.slug, title: it.title, body: bodies[it.p], crumb: `<a href="index.html">Главная</a> / <a href="${SECTION_SLUG[it.section]}.html">${it.section}</a>`, pager }));
+  fs.writeFileSync(`${OUT}/${it.slug}.html`, layout({ slug: it.slug, title: it.title, body: bodies[it.p], crumb: `<a href="index.html">Главная</a> / <a href="${SECTION_SLUG[it.section]}.html">${it.section}</a>`, pager, extra: PAGE_EXTRA[it.slug] }));
   results.push(it.slug);
 }
 
@@ -387,7 +418,7 @@ for (const sec of NAV) {
   <button type="submit">Найти</button>
 </form>
 <div class="home-results" id="home-results" role="region" aria-live="polite" aria-label="Результаты поиска" hidden></div>
-<div class="hub home-hub" id="home-hub">${SEC.map(([t, href, d, ic]) => `<a class="hub-tile" href="${href}">${icon(ic)}<span>${t}</span><small>${d}</small></a>`).join('')}</div>
+<div class="hub home-hub" id="home-hub">${SEC.map(([t, href, d, ic]) => `<a class="hub-tile" href="${href}">${icon(ic)}<span>${t}</span><small>${d}</small></a>`).join('')}<a class="hub-tile wide" href="fgu-zhurnal.html">${icon('trophy')}<span>Журнал баллов</span><small>Баллы и оценки ФГУ</small></a></div>
 </section>`;
   fs.writeFileSync(`${OUT}/index.html`, layout({ slug: 'index', title: SITE, body }));
 }

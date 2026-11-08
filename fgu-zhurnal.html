@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; connect-src 'self' https://script.google.com https://script.googleusercontent.com">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Журнал баллов — Отечественная история</title>
+<meta name="description" content="Сайт для студентов МГУ имени М. В. Ломоносова, изучающих отечественную историю: лекции, семинары, задания, результаты.">
+<meta name="theme-color" content="#0a4dff">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<a class="skip" href="#main">К содержанию</a>
+<header class="top">
+  <a class="masthead" href="index.html" aria-label="Отечественная история — на главную"><span class="mast-t">Отечественная история</span><span class="mast-s">К. А. Соловьёв · МГУ имени М. В. Ломоносова</span></a>
+  <div class="top-bar"><div class="top-in">
+    <a class="back" href="razdel-fgu.html" aria-label="Назад" title="Назад"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a>
+    <button class="burger" type="button" aria-controls="nav" aria-expanded="false" aria-label="Меню"><span></span><span></span><span></span></button>
+    <nav class="nav" id="nav" aria-label="Основное меню"><ul><li><a href="razdel-dopolnitelno.html">Важное</a></li><li><a href="razdel-speckurs.html">Спецкурс</a></li><li><a href="razdel-fgu.html" aria-current="page">ФГУ</a></li><li><a href="razdel-mehmat.html">Мехмат</a></li><li><a href="razdel-kursovye.html">Курсовые работы</a></li><li><a href="kontakty.html">Связаться</a></li></ul></nav>
+  </div></div>
+</header>
+<main id="main">
+<div class="wrap content panel">
+<div class="page-head"><p class="crumb"><a href="index.html">Главная</a> / <a href="razdel-fgu.html">ФГУ</a></p><h1>Журнал баллов</h1></div>
+<div class="jr" id="jr">
+<p class="jr-max">Максимум: <strong>138 баллов</strong>. Оценка зависит от суммы.</p>
+<ul class="jr-legend" aria-label="Оценки по сумме баллов"><li class="g5"><b>5</b><span>от 90 баллов</span></li><li class="g4"><b>4</b><span>75–89 баллов</span></li><li class="g3"><b>3</b><span>50–74 баллов</span></li><li class="g0"><b>–</b><span>менее 50</span></li></ul>
+<div class="jr-tools" id="jr-tools" hidden>
+  <input id="jr-filter" type="search" placeholder="Найти фамилию" autocomplete="off" aria-label="Найти фамилию">
+  <div class="jr-sort" role="group" aria-label="Порядок"><button type="button" data-sort="name" aria-pressed="true">По алфавиту</button><button type="button" data-sort="pts" aria-pressed="false">По баллам</button></div>
+</div>
+<div id="jr-body" aria-live="polite"><p class="jr-empty">Загружаю журнал…</p></div>
+<noscript><p>Чтобы увидеть журнал, включите JavaScript.</p></noscript>
+<section class="jr-self" id="jr-self" hidden>
+  <h2>Внести свои баллы</h2>
+  <p class="jr-hint">Выберите себя, введите код, который выдал преподаватель, и число баллов. Они сразу появятся в журнале.</p>
+  <form id="jr-form" autocomplete="off">
+    <label for="jr-who">Фамилия</label><select id="jr-who" required></select>
+    <label for="jr-code">Код</label><input id="jr-code" type="text" inputmode="text" autocapitalize="characters" spellcheck="false" placeholder="XXXXX-XXXXX" required>
+    <label for="jr-pts">Баллы</label><input id="jr-pts" type="number" inputmode="numeric" min="1" max="30" step="1" required>
+    <button class="btn" type="submit">ОК</button>
+    <p id="jr-msg" class="jr-msg" role="status" aria-live="polite"></p>
+  </form>
+</section>
+</div>
+<nav class="pager" aria-label="Соседние страницы"><span></span><a class="next" href="fgu-rejtingovaya-sistema.html"><small>Далее</small>Рейтинговая система</a></nav>
+</div>
+</main>
+<script src="assets/app.js"></script>
+<script type="module" src="assets/helper.js"></script>
+<script type="module" src="assets/journal.js"></script>
+</body>
+</html>

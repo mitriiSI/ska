@@ -64,3 +64,23 @@
 .editor-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; margin-top: 20px; }
 .adm .editor-actions .btn { margin-top: 0; }
 .edited-page img { max-width: 100%; height: auto; max-height: 75vh; }
+
+/* Журнал баллов */
+.j-list { display: grid; gap: 10px; margin-top: 12px; }
+.j-row { display: grid; gap: 10px; padding: 12px 14px; border-radius: 16px; border: 1px solid var(--line); border-left: 6px solid var(--gc, var(--g0)); background: color-mix(in srgb, var(--gc, var(--g0)) 10%, var(--surface)); }
+.j-top { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+.adm .j-name { flex: 1 1 200px; min-width: 0; font-weight: 600; }
+.j-total { display: inline-flex; align-items: center; gap: 8px; font: 700 22px/1 var(--sans); font-variant-numeric: tabular-nums; }
+.j-add { display: flex; gap: 8px; }
+.adm .j-pts { flex: 1 1 140px; max-width: 220px; }
+.adm form .btn.j-ok, .adm .btn.j-ok { margin: 0; padding: 10px 22px; border: 0; cursor: pointer; font: 600 16px/1 var(--sans); }
+.j-acts { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.j-nocode { color: var(--muted); font-size: 13.5px; }
+.j-hist { display: grid; gap: 6px; padding-top: 8px; border-top: 1px dashed var(--line); }
+.j-entry { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; font-size: 15px; }
+.j-entry b { min-width: 52px; font-variant-numeric: tabular-nums; }
+.j-entry span { flex: 1 1 140px; color: var(--muted); }
+.j-entry.self b { color: var(--g3); }
+.j-report .ok { color: #1b7a3a; margin: 8px 0 0; } .j-report .bad { color: #b3261e; margin: 6px 0 0; font-size: 14.5px; }
+#j-codes { font-family: ui-monospace, Menlo, Consolas, monospace; }
+.adm .editor-actions { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-top: 14px; }
