@@ -663,3 +663,6 @@ body {
   .nav a:hover { background-color: color-mix(in srgb, var(--accent) 12%, transparent); transform: none; }
   .nav a[aria-current="page"] { color: var(--accent); background-color: color-mix(in srgb, var(--accent) 14%, transparent); background-image: none; box-shadow: inset 3px 0 0 var(--orange); border: 0; font-weight: 600; }
 }
+
+/* На компьютере верхняя строка не липнет: без подложки она смешивалась бы с текстом при прокрутке */
+@media (min-width: 1101px) { .top-bar { position: static; } }
