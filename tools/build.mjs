@@ -418,7 +418,7 @@ for (const sec of NAV) {
   <button type="submit">Найти</button>
 </form>
 <div class="home-results" id="home-results" role="region" aria-live="polite" aria-label="Результаты поиска" hidden></div>
-<div class="hub home-hub" id="home-hub">${SEC.map(([t, href, d, ic]) => `<a class="hub-tile" href="${href}">${icon(ic)}<span>${t}</span><small>${d}</small></a>`).join('')}<a class="hub-tile wide" href="fgu-zhurnal.html">${icon('trophy')}<span>Журнал баллов</span><small>Баллы и оценки ФГУ</small></a></div>
+<div class="hub home-hub" id="home-hub">${SEC.map(([t, href, d, ic]) => `<a class="hub-tile" href="${href}">${icon(ic)}<span>${t}</span><small>${d}</small></a>`).join('')}</div>
 </section>`;
   fs.writeFileSync(`${OUT}/index.html`, layout({ slug: 'index', title: SITE, body }));
 }
