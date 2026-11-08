@@ -36,7 +36,7 @@ html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 body {
   margin: 0; background: var(--bg); color: var(--ink);
   font: 17px/1.65 var(--sans);
-  display: flex; flex-direction: column; min-height: 100vh;
+  display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh;
 }
 main { flex: 1; }
 img { max-width: 100%; height: auto; }
@@ -253,14 +253,18 @@ a:hover { text-decoration-thickness: 2px; }
   }
 }
 
-/* Живой фон, который стекло преломляет */
-body {
+/* Живой фон, который стекло преломляет.
+   Градиент лежит на закреплённом слое, а не на body: iOS Safari не умеет background-attachment: fixed,
+   и фон там заканчивался вместе с содержимым страницы. */
+html { background-color: var(--bg); min-height: 100%; }
+body { background: transparent; }
+body::before {
+  content: ""; position: fixed; left: 0; right: 0; top: 0; height: 100vh; height: 100lvh; z-index: -1; pointer-events: none;
   background:
     radial-gradient(60vmax 50vmax at 8% -8%, color-mix(in srgb, var(--accent) 32%, transparent), transparent 62%),
     radial-gradient(55vmax 45vmax at 98% 12%, color-mix(in srgb, var(--gold) 38%, transparent), transparent 60%),
     radial-gradient(60vmax 50vmax at 30% 108%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 62%),
     var(--bg);
-  background-attachment: fixed;
 }
 
 /* Общий материал */
@@ -663,3 +667,4 @@ body {
 
 /* На компьютере верхняя строка не липнет: без подложки она смешивалась бы с текстом при прокрутке */
 @media (min-width: 1101px) { .top-bar { position: static; } }
+@media print { body::before { display: none; } html { background: #fff; } }
