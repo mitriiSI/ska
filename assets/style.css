@@ -550,3 +550,44 @@ body {
 .home-ask:hover { color: var(--orange); }
 @media (max-width: 760px) { .home-hub { grid-template-columns: repeat(2, 1fr); gap: 10px; } .home-hub .hub-tile { min-height: 120px; } .home-search button { padding: 0 18px; } }
 @media (max-width: 420px) { .home-search input { padding: 11px 14px; font-size: 16px; } }
+
+/* Плотнее: меньше пустого места на всех экранах, особенно на телефоне */
+.masthead { padding-top: clamp(10px, 1.6vw, 18px); padding-bottom: 4px; gap: 4px; }
+.top-bar { padding: 6px 0 8px; }
+.content.panel { margin-top: 12px; margin-bottom: 36px; padding: 24px clamp(16px, 3.4vw, 40px) 28px; }
+.panel .page-head { padding-bottom: 12px; margin-bottom: 18px; }
+.hub { gap: 12px; }
+.hub-tile { aspect-ratio: auto; min-height: 150px; padding: 14px; gap: 10px; }
+.content.home-panel { padding-top: 20px; padding-bottom: 20px; }
+.home-lead { margin-bottom: 14px; }
+.home-search { margin-bottom: 16px; }
+.home-hub { gap: 12px; }
+.pager { margin-top: 32px; padding-top: 18px; }
+
+@media (max-width: 560px) {
+  .mast-t { font-size: clamp(34px, 11vw, 46px); line-height: 1; }
+  .mast-s { font-size: 11px; letter-spacing: .1em; }
+  .masthead { padding: 8px 12px 2px; gap: 2px; }
+  .top-bar { padding: 2px 0 4px; }
+  .burger { width: 40px; height: 40px; }
+  .burger span { width: 18px; margin: 3.5px auto; }
+  .burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
+  .burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); }
+  .content.panel { width: calc(100% - 20px); margin-top: 6px; margin-bottom: 24px; padding: 16px 14px 20px; border-radius: 22px; }
+  .content.home-panel { padding-top: 14px; padding-bottom: 14px; }
+  .panel .page-head { padding-bottom: 8px; margin-bottom: 12px; }
+  .panel .page-head h1 { font-size: 26px; }
+  .panel .crumb { margin-bottom: 2px; font-size: 13px; }
+  .hub { gap: 8px; }
+  .hub-tile { min-height: 96px; padding: 10px 8px; gap: 6px; border-radius: 20px; font-size: 14.5px; }
+  .hub-tile svg { width: 30px; height: 30px; }
+  .home-hub { gap: 8px; }
+  .home-hub .hub-tile { min-height: 104px; padding: 10px 8px; }
+  .home-hub .hub-tile span { font-size: 15px; }
+  .home-hub .hub-tile small { font-size: 12px; }
+  .home-lead { font-size: 15.5px; margin-bottom: 10px; }
+  .home-search { margin-bottom: 12px; }
+  .pager { margin-top: 20px; padding-top: 12px; gap: 8px; }
+  .pager a { padding: 10px 12px; }
+  .hlp-fab { width: 52px; height: 52px; }
+}
