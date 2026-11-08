@@ -58,3 +58,28 @@
     el.style.setProperty('--my', (e.clientY - r.top) + 'px');
   }, { passive: true });
 })();
+
+// Кнопка «Назад»: возвращает на предыдущую страницу сайта, а если пришли не отсюда, ведёт в раздел по ссылке.
+(function () {
+  var back = document.querySelector('.back');
+  if (!back) return;
+  back.addEventListener('click', function (e) {
+    try {
+      var ref = document.referrer && new URL(document.referrer);
+      if (ref && ref.origin === location.origin && ref.pathname !== location.pathname && history.length > 1) {
+        e.preventDefault();
+        history.back();
+      }
+    } catch (err) { /* остаётся обычная ссылка */ }
+  });
+})();
+
+// Меню на телефоне закрывается по нажатию вне него.
+document.addEventListener('click', function (e) {
+  var nav = document.getElementById('nav');
+  var burger = document.querySelector('.burger');
+  if (!nav || !burger || !nav.classList.contains('open')) return;
+  if (nav.contains(e.target) || burger.contains(e.target)) return;
+  nav.classList.remove('open');
+  burger.setAttribute('aria-expanded', 'false');
+});

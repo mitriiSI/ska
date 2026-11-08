@@ -254,6 +254,12 @@ function iconFor(slug) {
   return `<svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[hit ? hit[1] : 'file']}</svg>`;
 }
 
+// Куда ведёт кнопка «Назад», если страницу открыли напрямую: раздел для страниц раздела, иначе главная.
+function backHref(slug) {
+  const it = flat.find((x) => x.slug === slug);
+  return it && SECTION_SLUG[it.section] ? SECTION_SLUG[it.section] + '.html' : 'index.html';
+}
+
 function layout({ slug, title, body, crumb, desc, pager, script }) {
   const t = slug === 'index' ? `${SITE} — сайт ${AUTHOR_GEN}` : `${title} — ${SITE}`;
   return `<!doctype html>
@@ -274,6 +280,7 @@ function layout({ slug, title, body, crumb, desc, pager, script }) {
 <header class="top">
   <a class="masthead" href="index.html" aria-label="${SITE} — на главную"><span class="mast-t">${SITE}</span><span class="mast-s">К. А. Соловьёв · МГУ имени М. В. Ломоносова</span></a>
   ${slug === 'index' ? '' : `<div class="top-bar"><div class="top-in">
+    <a class="back" href="${backHref(slug)}" aria-label="Назад" title="Назад"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a>
     <button class="burger" type="button" aria-controls="nav" aria-expanded="false" aria-label="Меню"><span></span><span></span><span></span></button>
     ${navHtml(slug)}
   </div></div>`}
