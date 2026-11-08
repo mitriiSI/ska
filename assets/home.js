@@ -6,7 +6,7 @@ if (form) {
   const input = document.getElementById('home-q');
   const box = document.getElementById('home-results');
   const hub = document.getElementById('home-hub');
-  const EXAMPLES = ['лекция 5', 'рейтинговая система', 'вопросы к экзамену', 'как связаться', 'требования к статье'];
+  const EXAMPLES = ['лекция 5', 'рейтинг', 'экзамен', 'контакты', 'программа курса'];
   const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; };
 
   const SAY = {
@@ -73,7 +73,7 @@ if (form) {
     setInterval(() => {
       if (input.value || document.activeElement === input) return;
       i = (i + 1) % EXAMPLES.length;
-      input.placeholder = 'Например: ' + EXAMPLES[i];
+      input.placeholder = 'Найти: ' + EXAMPLES[i];
     }, 2800);
   }
 }
